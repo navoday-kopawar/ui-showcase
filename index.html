@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UI Showcase – Web Interfaces</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #111827;
+      --muted: #9ca3af;
+      --text: #f9fafb;
+      --accent: #38bdf8;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(180deg, #020617, #0f172a);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      padding: 2rem 1rem 1.5rem;
+    }
+
+    header h1 {
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-weight: 600;
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    /* Main */
+    main {
+      flex: 1;
+      padding: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .ui-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .ui-card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 1.4rem;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      cursor: pointer;
+    }
+
+    .ui-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 35px rgba(0, 0, 0, 0.4);
+    }
+
+    .preview-box {
+      height: 120px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #1f2937, #020617);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .ui-title {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+    }
+
+    .ui-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(8px);
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1>UI Showcase – Web Interfaces</h1>
+    <p>Modern UI designs & frontend recreations</p>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <section class="ui-grid">
+
+      <div class="ui-card">
+        <div class="preview-box">Dashboard Preview</div>
+        <div class="ui-title">Admin Dashboard</div>
+        <div class="ui-desc">
+          Clean analytics dashboard with cards, charts, and responsive layout.
+        </div>
+      </div>
+
+      <div class="ui-card">
+        <div class="preview-box">Landing Page</div>
+        <div class="ui-title">Product Landing</div>
+        <div class="ui-desc">
+          Modern hero sections, call-to-actions, and smooth UI flow.
+        </div>
+      </div>
+
+      <div class="ui-card">
+        <div class="preview-box">Mobile UI</div>
+        <div class="ui-title">App Interface</div>
+        <div class="ui-desc">
+          Mobile-first UI recreations inspired by real applications.
+        </div>
+      </div>
+
+      <div class="ui-card">
+        <div class="preview-box">Auth UI</div>
+        <div class="ui-title">Login & Signup</div>
+        <div class="ui-desc">
+          Accessible authentication screens with modern styling.
+        </div>
+      </div>
+
+      <div class="ui-card">
+        <div class="preview-box">E-commerce</div>
+        <div class="ui-title">Storefront UI</div>
+        <div class="ui-desc">
+          Product grids, carts, and checkout flow UI designs.
+        </div>
+      </div>
+
+      <div class="ui-card">
+        <div class="preview-box">Clone UI</div>
+        <div class="ui-title">Frontend Recreation</div>
+        <div class="ui-desc">
+          Pixel-inspired recreations of popular web interfaces.
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    Design by
+    <a href="https://navoday-kopawar.github.io/navoday-portfolio/" target="_blank" rel="noopener noreferrer">
+      Navoday
+    </a>
+  </footer>
+
+</body>
+</html>
