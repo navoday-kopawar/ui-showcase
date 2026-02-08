@@ -1,0 +1,111 @@
+    :root {
+        --bg: #020617;
+        --card: #111827;
+        --muted: #9ca3af;
+        --text: #f9fafb;
+        --accent: #38bdf8;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(180deg, #020617, #0f172a);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    header {
+        text-align: center;
+        padding: 2rem 1rem 1.5rem;
+    }
+
+    .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    header h1 {
+        font-size: clamp(1.5rem, 4vw, 2.2rem);
+        font-weight: 600;
+    }
+
+    header p {
+        margin-top: 0.5rem;
+        font-size: 0.95rem;
+        color: var(--muted);
+    }
+
+    main {
+        flex: 1;
+        padding: 1.5rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .ui-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1.8rem;
+        justify-items: center;
+    }
+
+    .ui-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.6rem;
+        text-decoration: none;
+        color: var(--muted);
+
+    }
+
+    .ui-item img {
+        width: 80px;
+        height: 80px;
+        transition: transform 0.2s ease;
+        filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35));
+    }
+
+    .ui-item:hover img {
+        transform: scale(1.12);
+    }
+
+    .ui-item span {
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-align: center;
+    }
+
+    .ui-item:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 6px;
+    }
+
+    footer {
+        text-align: center;
+        padding: 1rem;
+        font-size: 0.85rem;
+        color: var(--muted);
+        background: rgba(0, 0, 0, 0.25);
+        backdrop-filter: blur(8px);
+    }
+
+    footer a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    footer a:hover {
+        text-decoration: underline;
+    }
