@@ -1,0 +1,135 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: system-ui;
+    background-color: black;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    text-align: center;
+    padding: 20px;
+    width: 100%;
+    max-width: 1400px;
+}
+
+.title {
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.title img {
+    width: 50px;
+    height: auto;
+}
+
+h2 {
+    color: white;
+    font-size: 2.5rem;
+    white-space: nowrap;
+}
+
+#colorPalette {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+}
+
+.color-card {
+    width: 150px;
+    height: 200px;
+    border-radius: 10px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 15px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.color-card:hover {
+    transform: translateY(-5px);
+}
+
+.color-code {
+    background-color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+#generateBtn {
+    background-color: white;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    display: inline-block;
+}
+
+#generateBtn:hover {
+    transform: scale(1.05);
+}
+
+
+@media (min-width: 1024px) {
+    #colorPalette {
+        display: grid;
+        grid-auto-flow: column;
+        grid-template-rows: repeat(2, 200px);
+        gap: 20px;
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .color-card {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    h2 {
+        font-size: 2rem;
+    }
+
+    .title img {
+        width: 40px;
+    }
+
+    .color-card {
+        width: 130px;
+        height: 180px;
+    }
+}
+
+@media (max-width: 480px) {
+    h2 {
+        font-size: 1.7rem;
+    }
+
+    .title img {
+        width: 34px;
+    }
+
+    #generateBtn {
+        padding: 12px 30px;
+        font-size: 1rem;
+    }
+}

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="./favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon.png">
+
+    <title>Color Palette Generator </title>
+
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+    <div class="container">
+        <div class="title">
+            <img src="../assets/logo_Light.png" alt="logo2" border="0">
+            <h2>Color Palette Generator</h2>
+        </div>
+
+        <div id="colorPalette"></div>
+
+        <button id="generateBtn">Generate Palette</button>
+    </div>
+
+    <script>
+        function getRandomColor() {
+            const letters = "0123456789ABCDEF";
+            let color = "#";
+
+            for (let i = 0; i < 6; i++) {
+                const randomIndex = Math.floor(Math.random() * 16);
+                color += letters[randomIndex];
+            }
+
+            return color;
+        }
+
+        function createCard(color) {
+            const card = document.createElement("div");
+            card.setAttribute("class", "color-card");
+            card.style.backgroundColor = color;
+
+            const code = document.createElement("span");
+            code.setAttribute("class", "color-code");
+            code.textContent = color;
+
+            code.addEventListener("click", (e) => {
+                e.stopPropagation();
+                navigator.clipboard.writeText(color);
+                const originalText = code.textContent;
+                code.textContent = "Copied!";
+                setTimeout(() => {
+                    code.textContent = originalText;
+                }, 800);
+            });
+
+            card.append(code);
+            return card;
+        }
+
+        function getPaletteCount() {
+            const width = window.innerWidth;
+
+            if (width >= 1200) return 10;
+            if (width >= 900) return 8;
+            if (width >= 600) return 6;
+            return 4;
+        }
+
+        function generatePalette() {
+            const palette = document.querySelector("#colorPalette");
+            palette.innerHTML = '';
+
+            const count = getPaletteCount();
+
+            for (let i = 0; i < count; i++) {
+                const randomColor = getRandomColor();
+                const card = createCard(randomColor);
+                palette.append(card);
+            }
+        }
+
+        const generateBtn = document.querySelector("#generateBtn");
+        generateBtn.addEventListener("click", generatePalette);
+        window.addEventListener("resize", generatePalette);
+
+        generatePalette();
+    </script>
+
+</body>
+</html>
