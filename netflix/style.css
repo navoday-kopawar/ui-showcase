@@ -1,0 +1,181 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Netflix Sans', Arial, sans-serif;
+    background-color: #111;
+    color: #fff;
+}
+
+::-webkit-scrollbar {
+    width: 7px;
+    background-color: #111;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: white;
+    border-radius: 10px;
+}
+
+/* NAVBAR */
+.nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    transition: background 0.4s ease;
+}
+
+.nav.active {
+    background: #111;
+}
+
+.nav_logo {
+    width: 180px;
+}
+
+.nav_avatar {
+    width: 40px;
+}
+
+/* BANNER */
+#banner {
+    height: 640px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+#banner_contents {
+    padding-top: 320px;
+    padding-left: 70px;
+    max-width: 600px;
+}
+
+#banner_title {
+    font-size: 3rem;
+    font-weight: 800;
+}
+
+#banner_description {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    max-width: 420px;
+}
+
+.banner_btn {
+    margin-top: 1rem;
+    margin-right: 1rem;
+    padding: 8px 24px;
+    border: none;
+    border-radius: 4px;
+    background: rgba(51, 51, 51, 0.6);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.banner_btn:hover {
+    background: #e6e6e6;
+    color: #000;
+}
+
+#banner_fadeBottom {
+    height: 120px;
+    background: linear-gradient(180deg,
+            transparent,
+            rgba(37, 37, 37, 0.6),
+            #111);
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+/* ROWS */
+.row {
+    margin-left: 20px;
+    margin-top: 30px;
+}
+
+.row_title {
+    margin-left: 20px;
+    font-size: 1.2rem;
+}
+
+.row_posters {
+    display: flex;
+    overflow-x: scroll;
+    padding: 20px;
+}
+
+.row_posters::-webkit-scrollbar {
+    display: none;
+}
+
+.row_poster {
+    max-height: 180px;
+    margin-right: 10px;
+    transition: transform 0.3s;
+}
+
+.row_poster:hover {
+    transform: scale(1.1);
+}
+
+/* =========================
+   FOOTER
+========================= */
+.footer-logo {
+    margin-bottom: 24px;
+}
+
+.footer-logo img {
+    width: 120px;
+    opacity: 0.9;
+}
+.netflix-footer {
+    background-color: #111;
+    padding: 40px 20px;
+    margin-top: 60px;
+    color: #757575;
+    font-size: 0.85rem;
+}
+
+.footer-content {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.footer-question {
+    margin-bottom: 20px;
+}
+
+.footer-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.footer-links a {
+    color: #757575;
+    text-decoration: none;
+    font-size: 0.85rem;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
+
+.footer-copy {
+    font-size: 0.8rem;
+    color: #757575;
+}
