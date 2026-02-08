@@ -1,191 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UI Showcase – Web Interfaces</title>
-
-  <!-- Google Font -->
+  <link rel="icon" href="./favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="./assets/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon.png">
+  <title>UI Showcase | Web Interfaces</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
-  <style>
-    :root {
-      --bg: #020617;
-      --card: #111827;
-      --muted: #9ca3af;
-      --text: #f9fafb;
-      --accent: #38bdf8;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: "Poppins", sans-serif;
-      background: linear-gradient(180deg, #020617, #0f172a);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Header */
-    header {
-      text-align: center;
-      padding: 2rem 1rem 1.5rem;
-    }
-
-    header h1 {
-      font-size: clamp(1.5rem, 4vw, 2.2rem);
-      font-weight: 600;
-    }
-
-    header p {
-      margin-top: 0.5rem;
-      font-size: 0.95rem;
-      color: var(--muted);
-    }
-
-    /* Main */
-    main {
-      flex: 1;
-      padding: 1.5rem;
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    .ui-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .ui-card {
-      background: var(--card);
-      border-radius: 18px;
-      padding: 1.4rem;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      cursor: pointer;
-    }
-
-    .ui-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 18px 35px rgba(0, 0, 0, 0.4);
-    }
-
-    .preview-box {
-      height: 120px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #1f2937, #020617);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 1rem;
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-
-    .ui-title {
-      font-size: 1rem;
-      font-weight: 500;
-      margin-bottom: 0.4rem;
-    }
-
-    .ui-desc {
-      font-size: 0.85rem;
-      color: var(--muted);
-      line-height: 1.4;
-    }
-
-    /* Footer */
-    footer {
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.85rem;
-      color: var(--muted);
-      background: rgba(0, 0, 0, 0.25);
-      backdrop-filter: blur(8px);
-    }
-
-    footer a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
 
-  <!-- Header -->
+<body>
   <header>
-    <h1>UI Showcase – Web Interfaces</h1>
+    <div class="header-inner">
+      <img src="./assets/logo_Light.png" loading="eager" alt="UI Showcase Logo" width="66" height="66">
+      <h1>UI Showcase – Web Interfaces</h1>
+    </div>
     <p>Modern UI designs & frontend recreations</p>
   </header>
 
-  <!-- Main Content -->
   <main>
-    <section class="ui-grid">
+    <section class="ui-grid" aria-label="UI Showcase">
 
-      <div class="ui-card">
-        <div class="preview-box">Dashboard Preview</div>
-        <div class="ui-title">Admin Dashboard</div>
-        <div class="ui-desc">
-          Clean analytics dashboard with cards, charts, and responsive layout.
-        </div>
-      </div>
+      <a href="./calculator/calculator.html" class="ui-item">
+        <img src="./assets/ui-calculator.png" loading="lazy" alt="Calculator UI Preview">
+        <span>Calculator</span>
+      </a>
 
-      <div class="ui-card">
-        <div class="preview-box">Landing Page</div>
-        <div class="ui-title">Product Landing</div>
-        <div class="ui-desc">
-          Modern hero sections, call-to-actions, and smooth UI flow.
-        </div>
-      </div>
 
-      <div class="ui-card">
-        <div class="preview-box">Mobile UI</div>
-        <div class="ui-title">App Interface</div>
-        <div class="ui-desc">
-          Mobile-first UI recreations inspired by real applications.
-        </div>
-      </div>
+      <a href="./netflix/netflix.html" class="ui-item">
+        <img src="./assets/ui-netflix.png" loading="lazy" alt="Netflix UI Preview">
+        <span>Netflix</span>
+      </a>
 
-      <div class="ui-card">
-        <div class="preview-box">Auth UI</div>
-        <div class="ui-title">Login & Signup</div>
-        <div class="ui-desc">
-          Accessible authentication screens with modern styling.
-        </div>
-      </div>
 
-      <div class="ui-card">
-        <div class="preview-box">E-commerce</div>
-        <div class="ui-title">Storefront UI</div>
-        <div class="ui-desc">
-          Product grids, carts, and checkout flow UI designs.
-        </div>
-      </div>
+      <a href="./amazon/amazon.html" class="ui-item">
+        <img src="./assets/ui-amazon.png" loading="lazy" alt="Amazon UI Preview">
+        <span>Amazon</span>
+      </a>
 
-      <div class="ui-card">
-        <div class="preview-box">Clone UI</div>
-        <div class="ui-title">Frontend Recreation</div>
-        <div class="ui-desc">
-          Pixel-inspired recreations of popular web interfaces.
-        </div>
-      </div>
+      <a href="./colorPalette/colorPaletteGenerator.html" class="ui-item">
+        <img src="./assets/ui-colorPalette.png" loading="lazy" alt="Color Palette UI Preview">
+        <span>Color Pallet Generator</span>
+      </a>
+
+      <a href="./productFiltering/productFiltering.html" class="ui-item">
+        <img src="./assets/ui-productFiltering.png" loading="lazy" alt="Product Search & Filter UI Preview">
+        <span> Product Search & Filter</span>
+      </a>
+
+       <a href="./passwordGenerator/passwordGenerator.html" class="ui-item">
+        <img src="./assets/ui-passwordGenerator.png" loading="lazy" alt="Password Generator UI Preview">
+        <span> Password Generator</span>
+      </a>
 
     </section>
-  </main>
 
-  <!-- Footer -->
+  </main>
   <footer>
     Design by
     <a href="https://navoday-kopawar.github.io/navoday-portfolio/" target="_blank" rel="noopener noreferrer">
@@ -194,4 +68,5 @@
   </footer>
 
 </body>
+
 </html>
