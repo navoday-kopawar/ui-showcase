@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no" />
+  <link rel="icon" href="./favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon.png">
+  <link rel="stylesheet" href="./style.css">
+  <title>Calculator UI | UI Showcase</title>
+
+</head>
+
+<body>
+  <div class="app-shell">
+    <div class="calculator">
+
+      <div class="logo">
+        <img src="../assets/logo_Light.png" class="logo-dark">
+        <img src="../assets/logo_Dark.png" class="logo-light">
+      </div>
+
+      <div class="header">
+        <button class="theme-toggle" onclick="toggleTheme(); feedback();">
+          <div class="toggle-thumb"></div>
+        </button>
+      </div>
+
+      <div class="display-wrapper">
+        <textarea id="display" class="display" readonly>0</textarea>
+      </div>
+
+      <div class="buttons">
+
+        <!-- Clear / Backspace -->
+        <button class="clear" aria-label="Clear all" onclick="feedback(); clearAll()">
+          C
+        </button>
+
+        <button class="backspace" aria-label="Delete last digit" onclick="feedback(); deleteLast()">
+          ⌫
+        </button>
+
+        <!-- Operators -->
+        <button class="operator" aria-label="Divide" onclick="feedback(); appendToDisplay('/')">
+          ÷
+        </button>
+
+        <button class="operator" aria-label="Multiply" onclick="feedback(); appendToDisplay('*')">
+          ×
+        </button>
+
+        <!-- Numbers row 1 -->
+        <button aria-label="Number 7" onclick="feedback(); appendToDisplay('7')">
+          7
+        </button>
+
+        <button aria-label="Number 8" onclick="feedback(); appendToDisplay('8')">
+          8
+        </button>
+
+        <button aria-label="Number 9" onclick="feedback(); appendToDisplay('9')">
+          9
+        </button>
+
+        <button class="operator" aria-label="Subtract" onclick="feedback(); appendToDisplay('-')">
+          −
+        </button>
+
+        <!-- Numbers row 2 -->
+        <button aria-label="Number 4" onclick="feedback(); appendToDisplay('4')">
+          4
+        </button>
+
+        <button aria-label="Number 5" onclick="feedback(); appendToDisplay('5')">
+          5
+        </button>
+
+        <button aria-label="Number 6" onclick="feedback(); appendToDisplay('6')">
+          6
+        </button>
+
+        <button class="operator" aria-label="Add" onclick="feedback(); appendToDisplay('+')">
+          +
+        </button>
+
+        <!-- Numbers row 3 -->
+        <button aria-label="Number 1" onclick="feedback(); appendToDisplay('1')">
+          1
+        </button>
+
+        <button aria-label="Number 2" onclick="feedback(); appendToDisplay('2')">
+          2
+        </button>
+
+        <button aria-label="Number 3" onclick="feedback(); appendToDisplay('3')">
+          3
+        </button>
+
+        <!-- Equals -->
+        <button class="equals" aria-label="Calculate result" onclick="feedback(); calculate()">
+          =
+        </button>
+
+        <!-- Zero / Decimal -->
+        <button class="zero" aria-label="Number 0" onclick="feedback(); appendToDisplay('0')">
+          0
+        </button>
+
+        <button aria-label="Decimal point" onclick="feedback(); appendToDisplay('.')">
+          .
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+
+</html>
