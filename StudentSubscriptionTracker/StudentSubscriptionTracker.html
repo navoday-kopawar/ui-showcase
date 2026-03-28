@@ -1,0 +1,1739 @@
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Subscription Tracker</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <!-- <script src="/_sdk/element_sdk.js"></script> -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["DM Sans", "sans-serif"],
+              mono: ["Space Mono", "monospace"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+      }
+      .app-shell {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      .app-body {
+        flex: 1;
+        display: flex;
+        overflow: hidden;
+      }
+      .sidebar {
+        width: 260px;
+        flex-shrink: 0;
+        overflow-y: auto;
+        transition: transform 0.3s;
+      }
+      .main-content {
+        flex: 1;
+        overflow-y: auto;
+      }
+      .sidebar-overlay {
+        display: none;
+      }
+      @media (max-width: 768px) {
+        .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          height: 100%;
+          z-index: 50;
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .sidebar-overlay.open {
+          display: block;
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.4);
+          z-index: 40;
+        }
+      }
+      .tab-active {
+        border-bottom: 2px solid;
+        font-weight: 600;
+      }
+      .toast {
+        animation:
+          slideIn 0.3s ease,
+          fadeOut 0.3s ease 2.7s;
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateY(-20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+        }
+      }
+      .modal-backdrop {
+        animation: fadeIn 0.2s;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      .stat-card {
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      }
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+      }
+    </style>
+    <style>
+      body {
+        box-sizing: border-box;
+      }
+    </style>
+    <!-- <script src="/_sdk/data_sdk.js" type="text/javascript"></script> -->
+  </head>
+  <body class="h-full">
+    <div id="app" class="app-shell font-sans"></div>
+    <script>
+      // ==================== STATE ====================
+      const state = {
+        currentPage: "login",
+        loggedIn: false,
+        user: null,
+        currentTenantId: null,
+        activeProfileId: null,
+        tenants: [
+          {
+            id: "T001",
+            name: "Tipic IT Solutions",
+            logo: "📚",
+            type: "IT Training",
+            plan: "Enterprise",
+            status: "active",
+            joined: "2024-01-01"
+          }
+        ],
+        users: [
+          { id: "U001", email: "super@admin.com", password: "password", role: "super_admin", tenantId: null, name: "Super Provider" },
+          { id: "U002", email: "admin@edutrack.com", password: "password", role: "tenant_admin", tenantId: "T001", name: "Tipic Admin" }
+        ],
+        students: [
+          {
+            id: "STU001",
+            name: "Aarav Sharma",
+            email: "aarav@mail.com",
+            phone: "+91-9876543210",
+            status: "active",
+            joinDate: "2024-09-01",
+            course: "Full Stack Development",
+            avatar: "🧑‍💻",
+            tenantId: "T001",
+          },
+          {
+            id: "STU002",
+            name: "Priya Patel",
+            email: "priya@mail.com",
+            phone: "+91-9876543211",
+            status: "active",
+            joinDate: "2024-08-15",
+            course: "Data Science",
+            avatar: "👩‍🔬",
+            tenantId: "T001",
+          },
+          {
+            id: "STU003",
+            name: "Rahul Verma",
+            email: "rahul@mail.com",
+            phone: "+91-9876543212",
+            status: "blocked",
+            joinDate: "2024-07-20",
+            course: "UI/UX Design",
+            avatar: "🧑‍🎨",
+            tenantId: "T001",
+          },
+          {
+            id: "STU004",
+            name: "Sneha Gupta",
+            email: "sneha@mail.com",
+            phone: "+91-9876543213",
+            status: "expired",
+            joinDate: "2024-06-10",
+            course: "Digital Marketing",
+            avatar: "👩‍💼",
+            tenantId: "T001",
+          },
+          {
+            id: "STU005",
+            name: "Vikram Singh",
+            email: "vikram@mail.com",
+            phone: "+91-9876543214",
+            status: "active",
+            joinDate: "2024-10-01",
+            course: "Full Stack Development",
+            avatar: "👨‍💻",
+            tenantId: "T001",
+          },
+        ],
+        plans: [
+          {
+            id: "PLN001",
+            name: "3-Month Basic",
+            duration: 3,
+            price: 15000,
+            features: ["Course Access", "Email Support"],
+            status: "active",
+            tenantId: "T001",
+          },
+          {
+            id: "PLN002",
+            name: "6-Month Pro",
+            duration: 6,
+            price: 25000,
+            features: ["Course Access", "Priority Support", "Certificate"],
+            status: "active",
+            tenantId: "T001",
+          },
+          {
+            id: "PLN003",
+            name: "12-Month Premium",
+            duration: 12,
+            price: 40000,
+            features: [
+              "Course Access",
+              "Priority Support",
+              "Certificate",
+              "1-on-1 Mentoring",
+              "Job Assistance",
+            ],
+            status: "active",
+            tenantId: "T001",
+          },
+        ],
+        subscriptions: [
+          {
+            id: "SUB001",
+            studentId: "STU001",
+            planId: "PLN002",
+            startDate: "2024-09-01",
+            endDate: "2025-03-01",
+            status: "active",
+            courseAccess: true,
+            tenantId: "T001",
+          },
+          {
+            id: "SUB002",
+            studentId: "STU002",
+            planId: "PLN003",
+            startDate: "2024-08-15",
+            endDate: "2025-08-15",
+            status: "active",
+            courseAccess: true,
+            tenantId: "T001",
+          },
+          {
+            id: "SUB003",
+            studentId: "STU003",
+            planId: "PLN001",
+            startDate: "2024-07-20",
+            endDate: "2024-10-20",
+            status: "expired",
+            courseAccess: false,
+            tenantId: "T001",
+          },
+          {
+            id: "SUB004",
+            studentId: "STU004",
+            planId: "PLN002",
+            startDate: "2024-06-10",
+            endDate: "2024-12-10",
+            status: "expired",
+            courseAccess: false,
+            tenantId: "T001",
+          },
+          {
+            id: "SUB005",
+            studentId: "STU005",
+            planId: "PLN001",
+            startDate: "2024-10-01",
+            endDate: "2025-01-01",
+            status: "active",
+            courseAccess: true,
+            tenantId: "T001",
+          },
+        ],
+        payments: [
+          {
+            id: "PAY001",
+            studentId: "STU001",
+            subscriptionId: "SUB001",
+            installment: 1,
+            amount: 12500,
+            paidAmount: 12500,
+            dueDate: "2024-09-01",
+            paidDate: "2024-09-01",
+            status: "completed",
+          },
+          {
+            id: "PAY002",
+            studentId: "STU001",
+            subscriptionId: "SUB001",
+            installment: 2,
+            amount: 12500,
+            paidAmount: 8000,
+            dueDate: "2024-12-01",
+            paidDate: null,
+            status: "partial",
+          },
+          {
+            id: "PAY003",
+            studentId: "STU002",
+            subscriptionId: "SUB002",
+            installment: 1,
+            amount: 13333,
+            paidAmount: 13333,
+            dueDate: "2024-08-15",
+            paidDate: "2024-08-15",
+            status: "completed",
+          },
+          {
+            id: "PAY004",
+            studentId: "STU002",
+            subscriptionId: "SUB002",
+            installment: 2,
+            amount: 13333,
+            paidAmount: 0,
+            dueDate: "2024-12-15",
+            paidDate: null,
+            status: "pending",
+          },
+          {
+            id: "PAY005",
+            studentId: "STU003",
+            subscriptionId: "SUB003",
+            installment: 1,
+            amount: 15000,
+            paidAmount: 15000,
+            dueDate: "2024-07-20",
+            paidDate: "2024-07-20",
+            status: "completed",
+          },
+          {
+            id: "PAY006",
+            studentId: "STU005",
+            subscriptionId: "SUB005",
+            installment: 1,
+            amount: 7500,
+            paidAmount: 7500,
+            dueDate: "2024-10-01",
+            paidDate: "2024-10-01",
+            status: "completed",
+          },
+          {
+            id: "PAY007",
+            studentId: "STU005",
+            subscriptionId: "SUB005",
+            installment: 2,
+            amount: 7500,
+            paidAmount: 0,
+            dueDate: "2024-11-15",
+            paidDate: null,
+            status: "pending",
+            tenantId: "T001",
+          },
+        ],
+        notifications: [
+          {
+            id: 1,
+            type: "warning",
+            msg: "Priya Patel's installment due on Dec 15",
+            time: "2 hours ago",
+            read: false,
+          },
+          {
+            id: 2,
+            type: "danger",
+            msg: "Rahul Verma's subscription expired",
+            time: "1 day ago",
+            read: false,
+          },
+          {
+            id: 3,
+            type: "info",
+            msg: "New student Vikram Singh enrolled",
+            time: "3 days ago",
+            read: true,
+          },
+          {
+            id: 4,
+            type: "danger",
+            msg: "Sneha Gupta's subscription expired",
+            time: "5 days ago",
+            read: true,
+          },
+        ],
+        activityLog: [
+          {
+            studentId: "STU001",
+            action: "Payment received ₹12,500",
+            date: "2024-09-01",
+          },
+          {
+            studentId: "STU001",
+            action: "Partial payment ₹8,000",
+            date: "2024-12-01",
+          },
+          {
+            studentId: "STU001",
+            action: "Subscription assigned: 6-Month Pro",
+            date: "2024-09-01",
+          },
+          {
+            studentId: "STU002",
+            action: "Enrolled in Data Science",
+            date: "2024-08-15",
+          },
+          {
+            studentId: "STU002",
+            action: "Payment received ₹13,333",
+            date: "2024-08-15",
+          },
+          {
+            studentId: "STU003",
+            action: "Course access blocked: Payment overdue",
+            date: "2024-10-21",
+          },
+          {
+            studentId: "STU005",
+            action: "Payment received ₹7,500",
+            date: "2024-10-01",
+          },
+        ],
+      };
+
+      // ==================== HELPERS ====================
+      const $ = (id) => document.getElementById(id);
+      const getStudent = (id) => state.students.find((s) => s.id === id && s.tenantId === state.currentTenantId);
+      const getPlan = (id) => state.plans.find((p) => p.id === id && p.tenantId === state.currentTenantId);
+      const getSub = (sid) =>
+        state.subscriptions.find((s) => s.studentId === sid && s.tenantId === state.currentTenantId);
+      const getPayments = (sid) =>
+        state.payments.filter((p) => p.studentId === sid && p.tenantId === state.currentTenantId);
+      const statusBadge = (s) => {
+        const m = {
+          active: "bg-emerald-100 text-emerald-700",
+          expired: "bg-red-100 text-red-700",
+          blocked: "bg-gray-200 text-gray-600",
+          pending: "bg-amber-100 text-amber-700",
+          partial: "bg-orange-100 text-orange-700",
+          completed: "bg-emerald-100 text-emerald-700",
+        };
+        return `<span class="px-2 py-0.5 rounded-full text-xs font-medium ${m[s] || m.pending}">${s.charAt(0).toUpperCase() + s.slice(1)}</span>`;
+      };
+      const fmt = (n) => "₹" + Number(n).toLocaleString("en-IN");
+
+      function showToast(msg, type = "success") {
+        const t = document.createElement("div");
+        const colors = {
+          success: "bg-emerald-600",
+          error: "bg-red-600",
+          info: "bg-blue-600",
+        };
+        t.className = `toast fixed top-4 right-4 z-[100] ${colors[type]} text-white px-5 py-3 rounded-lg shadow-lg text-sm font-medium`;
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 3000);
+      }
+
+      // ==================== CONFIG ====================
+      const defaultConfig = {
+        app_title: "Student Subscription Tracker",
+        company_name: "EduTrack Pro",
+        bg_color: "#0f172a",
+        surface_color: "#ffffff",
+        text_color: "#1e293b",
+        primary_color: "#6366f1",
+        secondary_color: "#e2e8f0",
+      };
+
+      let appConfig = { ...defaultConfig };
+
+      function applyConfig(cfg) {
+        appConfig = { ...defaultConfig, ...cfg };
+        document
+          .querySelectorAll("[data-cfg-title]")
+          .forEach((el) => (el.textContent = appConfig.app_title));
+        document
+          .querySelectorAll("[data-cfg-company]")
+          .forEach((el) => (el.textContent = appConfig.company_name));
+        document.documentElement.style.setProperty("--bg", appConfig.bg_color);
+        document.documentElement.style.setProperty(
+          "--surface",
+          appConfig.surface_color,
+        );
+        document.documentElement.style.setProperty(
+          "--text",
+          appConfig.text_color,
+        );
+        document.documentElement.style.setProperty(
+          "--primary",
+          appConfig.primary_color,
+        );
+        document.documentElement.style.setProperty(
+          "--secondary",
+          appConfig.secondary_color,
+        );
+        // Apply colors to dynamic elements
+        document
+          .querySelectorAll(".sidebar-bg")
+          .forEach((el) => (el.style.backgroundColor = appConfig.bg_color));
+        document.querySelectorAll(".primary-btn").forEach((el) => {
+          el.style.backgroundColor = appConfig.primary_color;
+        });
+        document
+          .querySelectorAll(".brand-text")
+          .forEach((el) => (el.style.color = appConfig.primary_color));
+      }
+
+      // window.elementSdk.init({
+      //   defaultConfig,
+      //   onConfigChange: async (config) => applyConfig(config),
+      //   mapToCapabilities: (config) => ({
+      //     recolorables: [
+      //       { get: () => config.bg_color || defaultConfig.bg_color, set: v => { config.bg_color = v; window.elementSdk.setConfig({ bg_color: v }); } },
+      //       { get: () => config.surface_color || defaultConfig.surface_color, set: v => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); } },
+      //       { get: () => config.text_color || defaultConfig.text_color, set: v => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+      //       { get: () => config.primary_color || defaultConfig.primary_color, set: v => { config.primary_color = v; window.elementSdk.setConfig({ primary_color: v }); } },
+      //       { get: () => config.secondary_color || defaultConfig.secondary_color, set: v => { config.secondary_color = v; window.elementSdk.setConfig({ secondary_color: v }); } },
+      //     ],
+      //     borderables: [],
+      //     fontEditable: { get: () => config.font_family || 'DM Sans', set: v => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); } },
+      //     fontSizeable: { get: () => config.font_size || 16, set: v => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); } },
+      //   }),
+      //   mapToEditPanelValues: (config) => new Map([
+      //     ['app_title', config.app_title || defaultConfig.app_title],
+      //     ['company_name', config.company_name || defaultConfig.company_name],
+      //   ])
+      // });
+
+      // ==================== RENDER ====================
+      function render() {
+        const app = $("app");
+        if (!state.loggedIn) {
+          renderLogin(app);
+          return;
+        }
+        app.innerHTML = `
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <nav class="w-full h-14 flex items-center justify-between px-4 border-b border-gray-200 bg-white flex-shrink-0 z-30">
+      <div class="flex items-center gap-3">
+        <button id="menuBtn" class="md:hidden p-1.5 rounded-lg hover:bg-gray-100"><i data-lucide="menu" class="w-5 h-5"></i></button>
+        <span class="font-bold text-lg brand-text" data-cfg-title>${appConfig.app_title}</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 pl-3">
+          <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-sm">👤</div>
+          <span class="text-sm font-medium hidden sm:block">Admin</span>
+          <button id="logoutBtn" class="text-xs text-gray-400 hover:text-red-500 ml-1"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+        </div>
+      </div>
+    </nav>
+    <div class="app-body">
+      <aside class="sidebar sidebar-bg text-white p-4 flex flex-col gap-1" id="sidebar">
+        <div class="flex items-center gap-2 mb-6 px-2">
+          <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-lg">📚</div>
+          <div><div class="text-sm font-bold" data-cfg-company>${appConfig.company_name}</div><div class="text-[10px] text-gray-400">Management System</div></div>
+        </div>
+        ${[
+          "dashboard",
+          "students",
+          "subscriptions",
+          "payments",
+          "settings",
+        ]
+          .map(
+            (p) => `
+          <button data-nav="${p}" class="nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${state.currentPage === p ? "bg-white/15 text-white font-semibold" : "text-gray-400 hover:text-white hover:bg-white/5"}">
+            <i data-lucide="${{ dashboard: "layout-dashboard", students: "users", subscriptions: "credit-card", payments: "banknote", settings: "settings" }[p]}" class="w-4 h-4"></i>
+            ${{ dashboard: "Dashboard", students: "Students", subscriptions: "Subscriptions", payments: "Payments", settings: "Settings" }[p]}
+          </button>
+        `,
+          )
+          .join("")}
+      </aside>
+      <main class="main-content bg-gray-50 p-4 md:p-6" id="mainContent"></main>
+    </div>
+  `;
+        lucide.createIcons();
+        renderPage();
+
+        // Event bindings
+        $("menuBtn").onclick = () => {
+          $("sidebar").classList.toggle("open");
+          $("sidebarOverlay").classList.toggle("open");
+        };
+        $("sidebarOverlay").onclick = () => {
+          $("sidebar").classList.remove("open");
+          $("sidebarOverlay").classList.remove("open");
+        };
+        $("logoutBtn").onclick = () => {
+          state.loggedIn = false;
+          state.currentPage = "login";
+          render();
+        };
+        // notification binding removed
+        document.querySelectorAll(".nav-btn").forEach(
+          (b) =>
+            (b.onclick = () => {
+              state.currentPage = b.dataset.nav;
+              renderPage();
+              updateNav();
+              $("sidebar").classList.remove("open");
+              $("sidebarOverlay").classList.remove("open");
+            }),
+        );
+        applyConfig(appConfig);
+      }
+
+      function updateNav() {
+        document.querySelectorAll(".nav-btn").forEach((b) => {
+          const active = b.dataset.nav === state.currentPage;
+          b.className = `nav-btn flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${active ? "bg-white/15 text-white font-semibold" : "text-gray-400 hover:text-white hover:bg-white/5"}`;
+        });
+      }
+
+      function renderPage() {
+        const mc = $("mainContent");
+        
+        if (state.user?.role === "super_admin") {
+           renderSuperDashboard(mc);
+           return;
+        }
+
+        const pages = {
+          dashboard: renderDashboard,
+          students: renderStudents,
+          subscriptions: renderSubscriptions,
+          payments: renderPayments,
+          settings: renderSettings,
+          profile: renderProfilePage,
+        };
+        (pages[state.currentPage] || renderDashboard)(mc);
+        lucide.createIcons();
+      }
+
+      // ==================== LOGIN ====================
+      function renderLogin(el) {
+        el.innerHTML = `
+    <div class="h-full w-full flex items-center justify-center" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);">
+      <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm mx-4">
+        <div class="text-center mb-6">
+          <div class="w-14 h-14 rounded-2xl bg-indigo-100 flex items-center justify-center text-2xl mx-auto mb-3">📚</div>
+          <h1 class="text-xl font-bold text-gray-900" data-cfg-company>${appConfig.company_name}</h1>
+          <p class="text-sm text-gray-500 mt-1">Sign in to your dashboard</p>
+        </div>
+        <form id="loginForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input type="email" value="admin@edutrack.com" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <input type="password" value="password" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <label class="flex items-center gap-2"><input type="checkbox" checked class="rounded"> Remember me</label>
+            <a class="text-indigo-600 hover:underline cursor-pointer">Forgot password?</a>
+          </div>
+          <button type="submit" class="primary-btn w-full py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:opacity-90 transition">Sign In</button>
+        </form>
+        <p class="text-center text-xs text-gray-400 mt-5">Demo: Just click Sign In</p>
+      </div>
+    </div>
+  `;
+        lucide.createIcons();
+        $("loginForm").onsubmit = (e) => {
+          e.preventDefault();
+          const email = e.target.querySelector('input[type="email"]').value;
+          const pass = e.target.querySelector('input[type="password"]').value;
+          
+          const found = state.users.find(u => u.email === email && u.password === pass);
+          if (found) {
+            state.loggedIn = true;
+            state.user = found;
+            state.currentTenantId = found.tenantId;
+            state.currentPage = found.role === 'super_admin' ? 'super_dashboard' : 'dashboard';
+            render();
+            showToast(`Welcome back, ${found.name}!`);
+          } else {
+            showToast("Invalid credentials", "danger");
+          }
+        };
+        applyConfig(appConfig);
+      }
+
+      // ==================== SUPER ADMIN ====================
+      function renderSuperDashboard(el) {
+        el.innerHTML = `
+          <div class="max-w-7xl mx-auto pb-10">
+            <div class="mb-8 flex justify-between items-center">
+              <div>
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Software Provider Hub</h1>
+                <p class="text-slate-500 mt-1">Global ecosystem overview and tenant management.</p>
+              </div>
+              <button onclick="openTenantModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-sm transition flex items-center gap-2">
+                <i data-lucide="plus-circle" class="w-5 h-5"></i> New Business
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+              <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                <div class="flex items-center gap-4">
+                  <div class="bg-blue-50 text-blue-600 w-12 h-12 rounded-xl flex items-center justify-center"><i data-lucide="building-2"></i></div>
+                  <div><p class="text-sm font-medium text-slate-400">Total Tenants</p><p class="text-2xl font-bold font-mono">${state.tenants.length}</p></div>
+                </div>
+              </div>
+              <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                <div class="flex items-center gap-4">
+                  <div class="bg-emerald-50 text-emerald-600 w-12 h-12 rounded-xl flex items-center justify-center"><i data-lucide="banknote"></i></div>
+                  <div><p class="text-sm font-medium text-slate-400">Monthly Recurring</p><p class="text-2xl font-bold font-mono">${fmt(state.tenants.length * 5000)}</p></div>
+                </div>
+              </div>
+              <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                <div class="flex items-center gap-4">
+                  <div class="bg-amber-50 text-amber-600 w-12 h-12 rounded-xl flex items-center justify-center"><i data-lucide="activity"></i></div>
+                  <div><p class="text-sm font-medium text-slate-400">Platform Health</p><p class="text-2xl font-bold font-mono">99.9%</p></div>
+                </div>
+              </div>
+            </div>
+
+            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <i data-lucide="users" class="w-5 h-5 text-indigo-500"></i> Active Businesses
+            </h3>
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-left text-slate-400 bg-slate-50/50">
+                    <th class="px-6 py-4 font-semibold uppercase tracking-wider text-[10px]">Business</th>
+                    <th class="px-6 py-4 font-semibold uppercase tracking-wider text-[10px]">Type</th>
+                    <th class="px-6 py-4 font-semibold uppercase tracking-wider text-[10px]">Service Plan</th>
+                    <th class="px-6 py-4 font-semibold uppercase tracking-wider text-[10px]">Status</th>
+                    <th class="px-6 py-4 font-semibold uppercase tracking-wider text-[10px]">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                  ${state.tenants.map(t => `
+                    <tr class="hover:bg-slate-50/30 transition-colors">
+                      <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                          <div class="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center text-lg">${t.logo}</div>
+                          <div><div class="font-bold text-slate-900">${t.name}</div><div class="text-[10px] text-slate-400">ID: ${t.id}</div></div>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 text-slate-600">${t.type}</td>
+                      <td class="px-6 py-4"><span class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md font-medium text-[11px] border border-slate-200">${t.plan}</span></td>
+                      <td class="px-6 py-4">${statusBadge(t.status)}</td>
+                      <td class="px-6 py-4">
+                        <div class="flex gap-2">
+                          <button onclick="loginAsTenant('${t.id}')" class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Login as Tenant Admin">
+                            <i data-lucide="external-link" class="w-4 h-4"></i>
+                          </button>
+                          <button class="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition">
+                            <i data-lucide="settings-2" class="w-4 h-4"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+        lucide.createIcons();
+      }
+
+      window.loginAsTenant = (tenantId) => {
+        const u = state.users.find(u => u.tenantId === tenantId);
+        if (u) {
+          state.user = u;
+          state.currentTenantId = tenantId;
+          state.currentPage = 'dashboard';
+          render();
+          showToast(`Impersonating ${u.name}`);
+        }
+      };
+
+      window.openTenantModal = () => {
+         showToast("Tenant Creation form feature coming in next iteration!", "info");
+      };
+
+      // ==================== DASHBOARD ====================
+      function renderDashboard(el) {
+        const activeStudents = state.students.filter(
+          (s) => s.status === "active" && s.tenantId === state.currentTenantId,
+        ).length;
+        const activeSubs = state.subscriptions.filter(
+          (s) => s.status === "active" && s.tenantId === state.currentTenantId,
+        ).length;
+        const totalRevenue = state.payments
+          .filter((p) => p.status === "completed" || p.status === "partial")
+          .reduce((a, p) => a + p.paidAmount, 0);
+        const expiredSubs = state.subscriptions.filter(
+          (s) => s.status === "expired",
+        ).length;
+        const pendingPayments = state.payments.filter(
+          (p) => p.status === "pending" || p.status === "partial",
+        ).length;
+
+        el.innerHTML = `
+    <div class="max-w-7xl mx-auto">
+      <div class="flex items-center justify-between mb-6">
+        <div><h1 class="text-2xl font-bold text-gray-900">Dashboard</h1><p class="text-sm text-gray-500">Overview of your institution</p></div>
+        <span class="text-sm text-gray-400 font-mono">${new Date().toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "short", day: "numeric" })}</span>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        ${[
+          {
+            label: "Total Students",
+            value: state.students.length,
+            icon: "users",
+            color: "indigo",
+            emoji: "👥",
+          },
+          {
+            label: "Active Subs",
+            value: activeSubs,
+            icon: "credit-card",
+            color: "emerald",
+            emoji: "✅",
+          },
+          {
+            label: "Revenue",
+            value: fmt(totalRevenue),
+            icon: "banknote",
+            color: "blue",
+            emoji: "💰",
+          },
+          {
+            label: "Expired",
+            value: expiredSubs,
+            icon: "clock",
+            color: "red",
+            emoji: "⏰",
+          },
+          {
+            label: "Pending Pay",
+            value: pendingPayments,
+            icon: "alert-circle",
+            color: "amber",
+            emoji: "⚠️",
+          },
+        ]
+          .map(
+            (k) => `
+          <div class="stat-card bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-2xl">${k.emoji}</span>
+              <i data-lucide="${k.icon}" class="w-4 h-4 text-gray-300"></i>
+            </div>
+            <div class="text-xl font-bold text-gray-900">${k.value}</div>
+            <div class="text-xs text-gray-500 mt-0.5">${k.label}</div>
+          </div>
+        `,
+          )
+          .join("")}
+      </div>
+      <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-gray-900">Recent Students</h3>
+          <button onclick="state.currentPage='students';renderPage();updateNav();" class="text-xs text-indigo-600 hover:underline">View All →</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="text-left text-gray-400 text-xs border-b">
+              <th class="pb-2 font-medium">Student</th><th class="pb-2 font-medium">Course</th><th class="pb-2 font-medium">Status</th><th class="pb-2 font-medium">Joined</th>
+            </tr></thead>
+            <tbody>
+              ${state.students
+                .slice(0, 5)
+                .map(
+                  (s) => `<tr class="border-b border-gray-50 hover:bg-gray-50">
+                <td class="py-2.5"><div class="flex items-center gap-2"><span class="text-lg">${s.avatar}</span><div><div class="font-medium text-gray-900">${s.name}</div><div class="text-xs text-gray-400">${s.id}</div></div></div></td>
+                <td class="py-2.5 text-gray-600">${s.course}</td>
+                <td class="py-2.5">${statusBadge(s.status)}</td>
+                <td class="py-2.5 text-gray-500">${s.joinDate}</td>
+              </tr>`,
+                )
+                .join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+      }
+
+      // ==================== STUDENTS ====================
+      function renderStudents(el) {
+        el.innerHTML = `
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
+        <div><h1 class="text-2xl font-bold text-gray-900">Students</h1><p class="text-sm text-gray-500">Manage all students</p></div>
+        <button id="addStudentBtn" class="primary-btn flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:opacity-90">
+          <i data-lucide="user-plus" class="w-4 h-4"></i> Enroll Student
+        </button>
+      </div>
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+        <div class="p-4 border-b flex flex-col sm:flex-row gap-3">
+          <div class="flex-1 relative">
+            <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
+            <input id="studentSearch" type="text" placeholder="Search students..." class="w-full pl-9 pr-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-200">
+          </div>
+          <select id="studentFilter" class="px-3 py-2 border rounded-lg text-sm outline-none">
+            <option value="">All Status</option><option value="active">Active</option><option value="expired">Expired</option><option value="blocked">Blocked</option>
+          </select>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="text-left text-gray-400 text-xs border-b bg-gray-50">
+              <th class="px-4 py-3 font-medium">Student</th><th class="px-4 py-3 font-medium">Contact</th><th class="px-4 py-3 font-medium">Course</th><th class="px-4 py-3 font-medium">Status</th><th class="px-4 py-3 font-medium">Actions</th>
+            </tr></thead>
+            <tbody id="studentTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="mt-6 bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+        <h3 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">🚫 Blocked Students</h3>
+        <div id="blockedList" class="space-y-2"></div>
+      </div>
+    </div>
+    <div id="studentModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="modal-backdrop absolute inset-0 bg-black/40" id="studentModalBg"></div>
+      <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90%] overflow-y-auto p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 id="studentModalTitle" class="text-lg font-bold">Enroll Student</h3>
+          <button id="closeStudentModal" class="p-1 hover:bg-gray-100 rounded"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <form id="studentForm" class="space-y-4">
+          <input type="hidden" id="editStudentId">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div><label class="block text-xs font-medium text-gray-600 mb-1">Full Name</label><input id="sName" required class="w-full px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-200"></div>
+            <div><label class="block text-xs font-medium text-gray-600 mb-1">Email</label><input id="sEmail" type="email" required class="w-full px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-200"></div>
+            <div><label class="block text-xs font-medium text-gray-600 mb-1">Phone</label><input id="sPhone" required class="w-full px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-200"></div>
+          </div>
+          <div id="statusContainer" class="hidden"><label class="block text-xs font-medium text-gray-600 mb-1">Status</label><select id="sStatus" class="w-full px-3 py-2 border rounded-lg text-sm outline-none"><option value="active">Active</option><option value="expired">Expired</option><option value="blocked">Blocked</option></select></div>
+          <div class="border-t pt-3">
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-sm font-semibold text-gray-900">Courses & Plans</label>
+              <button type="button" onclick="addCourseRow()" class="text-xs text-indigo-600 hover:underline font-medium">+ Add Course</button>
+            </div>
+            <div id="courseRows" class="space-y-2"></div>
+          </div>
+          <div class="border-t pt-3">
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-sm font-semibold text-gray-900">Installments / Payments</label>
+              <button type="button" onclick="addInstallmentRow()" class="text-xs text-indigo-600 hover:underline font-medium">+ Add Installment</button>
+            </div>
+            <div id="installmentRows" class="space-y-2"></div>
+          </div>
+          <button type="submit" class="primary-btn w-full py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:opacity-90 mt-2">Save Student</button>
+        </form>
+      </div>
+    </div>
+
+  `;
+        renderStudentTable();
+        renderBlockedList();
+
+        $("addStudentBtn").onclick = () => openStudentModal();
+        $("closeStudentModal").onclick = () =>
+          $("studentModal").classList.add("hidden");
+        $("studentModalBg").onclick = () =>
+          $("studentModal").classList.add("hidden");
+
+        $("studentSearch").oninput = renderStudentTable;
+        $("studentFilter").onchange = renderStudentTable;
+        window.courseOpts = `<option>Full Stack Development</option><option>Data Science</option><option>UI/UX Design</option><option>Digital Marketing</option><option>Mobile App Development</option>`;
+        window.addCourseRow = (data = {}) => {
+          const div = document.createElement("div");
+          div.className = "course-row flex items-start gap-2 bg-gray-50 p-3 rounded-lg border";
+          const planOpts = state.plans.map(p => `<option value="${p.id}" ${data.planId===p.id?'selected':''}>${p.name}</option>`).join("");
+          div.innerHTML = `
+            <input type="hidden" class="c-id" value="${data.id || ''}">
+            <input type="hidden" class="c-start" value="${data.startDate || ''}">
+            <div class="flex-1 min-w-[120px]"><label class="block text-[10px] text-gray-500 mb-1">Course</label><select class="c-name w-full px-2 py-1.5 border rounded text-xs select-course">${window.courseOpts}</select></div>
+            <div class="flex-1 min-w-[120px]"><label class="block text-[10px] text-gray-500 mb-1">Plan</label><select class="c-plan w-full px-2 py-1.5 border rounded text-xs" onchange="this.closest('.course-row').querySelector('.c-dur').value=getPlan(this.value)?.duration||1">${planOpts}</select></div>
+            <div class="w-16"><label class="block text-[10px] text-gray-500 mb-1">Dur(mo)</label><input type="number" class="c-dur w-full px-2 py-1.5 border rounded text-xs" value="${data.duration || (state.plans[0]?getPlan(state.plans[0].id).duration:1)}"></div>
+            <div class="w-40">
+              <label class="flex justify-between items-center text-[10px] text-gray-500 mb-1">
+                <span>Validity Till</span>
+                ${data.id ? `<button type="button" onclick="let inp=this.parentElement.nextElementSibling; let d=new Date(inp.value); d.setMonth(d.getMonth()+parseInt(this.closest('.course-row').querySelector('.c-dur').value||1)); inp.value=d.toISOString().split('T')[0]; showToast('Plan dynamically extended!');" class="text-indigo-600 hover:text-indigo-800 font-semibold px-1 rounded hover:bg-indigo-50 transition">Extend</button>` : ''}
+              </label>
+              <input type="date" class="c-end w-full px-2 py-1.5 border rounded text-xs" value="${data.endDate || ''}">
+            </div>
+            <div class="w-16"><label class="block text-[10px] text-gray-500 mb-1">Disc(₹)</label><input type="number" class="c-disc w-full px-2 py-1.5 border rounded text-xs" value="${data.discount || 0}"></div>
+            <button type="button" onclick="this.closest('.course-row').remove()" class="mt-5 text-red-400 hover:text-red-500"><i data-lucide="trash" class="w-4 h-4"></i></button>
+          `;
+          if(data.course) div.querySelector(".c-name").value = data.course;
+          $("courseRows").appendChild(div);
+          lucide.createIcons({root: div});
+        };
+
+        window.addInstallmentRow = (data = {}) => {
+          const div = document.createElement("div");
+          div.className = "installment-row flex flex-wrap sm:flex-nowrap items-start gap-2 bg-gray-50 p-3 rounded-lg border";
+          div.innerHTML = `
+            <input type="hidden" class="i-id" value="${data.id || ''}">
+            <div class="w-full sm:w-24"><label class="block text-[10px] text-gray-500 mb-1">Amt(₹)</label><input type="number" required class="i-amt w-full px-2 py-1.5 border rounded text-xs" value="${data.amount || ''}"></div>
+            <div class="w-full sm:w-24"><label class="block text-[10px] text-gray-500 mb-1">Paid(₹)</label><input type="number" required class="i-paid w-full px-2 py-1.5 border rounded text-xs" value="${data.paidAmount ?? 0}"></div>
+            <div class="w-full sm:w-32"><label class="block text-[10px] text-gray-500 mb-1">Due Date</label><input type="date" required class="i-due w-full px-2 py-1.5 border rounded text-xs" value="${data.dueDate || ''}"></div>
+            <div class="flex-1"><label class="block text-[10px] text-gray-500 mb-1">Status</label>
+              <select class="i-status w-full px-2 py-1.5 border rounded text-xs">
+                <option value="pending" ${data.status === 'pending' ? 'selected' : ''}>Pending</option>
+                <option value="partial" ${data.status === 'partial' ? 'selected' : ''}>Partial</option>
+                <option value="completed" ${data.status === 'completed' ? 'selected' : ''}>Completed</option>
+                <option value="delayed" ${data.status === 'delayed' ? 'selected' : ''}>Delayed</option>
+              </select>
+            </div>
+            <button type="button" onclick="this.closest('.installment-row').remove()" class="mt-1 sm:mt-5 text-red-400 hover:text-red-500"><i data-lucide="trash" class="w-4 h-4"></i></button>
+          `;
+          $("installmentRows").appendChild(div);
+          lucide.createIcons({root: div});
+        };
+
+        $("studentForm").onsubmit = (e) => {
+          e.preventDefault();
+          const eid = $("editStudentId").value;
+          
+          const courses = [];
+          document.querySelectorAll('.course-row').forEach(row => {
+            courses.push({
+              id: row.querySelector('.c-id').value,
+              startDate: row.querySelector('.c-start').value,
+              endDate: row.querySelector('.c-end').value,
+              course: row.querySelector('.c-name').value,
+              planId: row.querySelector('.c-plan').value,
+              duration: parseInt(row.querySelector('.c-dur').value) || 0,
+              discount: parseInt(row.querySelector('.c-disc').value) || 0
+            });
+          });
+          
+          const installs = [];
+          document.querySelectorAll('.installment-row').forEach((row, idx) => {
+            installs.push({
+              id: row.querySelector('.i-id').value,
+              installment: idx + 1,
+              amount: parseFloat(row.querySelector('.i-amt').value) || 0,
+              paidAmount: parseFloat(row.querySelector('.i-paid').value) || 0,
+              dueDate: row.querySelector('.i-due').value,
+              status: row.querySelector('.i-status').value
+            });
+          });
+
+          const courseSummary = courses.map(c => c.course).join(", ") || "No courses";
+
+          if (eid) {
+            const s = getStudent(eid);
+            s.name = $("sName").value;
+            s.email = $("sEmail").value;
+            s.phone = $("sPhone").value;
+            s.course = courseSummary;
+            s.status = $("sStatus").value;
+
+            // Simple update: remove old subs/payments for this student, insert new
+            state.subscriptions = state.subscriptions.filter(x => x.studentId !== eid);
+            state.payments = state.payments.filter(x => x.studentId !== eid);
+
+            courses.forEach(c => {
+              const start = c.startDate || new Date().toISOString().split("T")[0];
+              let endStr = c.endDate;
+              if (!endStr) {
+                const end = new Date(start);
+                end.setMonth(end.getMonth() + c.duration);
+                endStr = end.toISOString().split("T")[0];
+              }
+              state.subscriptions.push({
+                id: c.id || ("SUB" + String(Date.now()).slice(-4) + Math.floor(Math.random()*100)),
+                studentId: eid,
+                planId: c.planId,
+                startDate: start,
+                endDate: endStr,
+                status: "active",
+                courseAccess: true,
+                derivedCourseName: c.course,
+                discount: c.discount,
+                tenantId: state.currentTenantId
+              });
+            });
+
+            installs.forEach(i => {
+              state.payments.push({
+                id: i.id || ("PAY" + String(Date.now()).slice(-4) + Math.floor(Math.random()*100)),
+                studentId: eid,
+                subscriptionId: state.subscriptions.find(sub => sub.studentId === eid)?.id || "",
+                installment: i.installment,
+                amount: i.amount,
+                paidAmount: i.paidAmount,
+                dueDate: i.dueDate,
+                paidDate: (i.status === 'completed' && i.paidAmount > 0) ? new Date().toISOString().split("T")[0] : null,
+                status: i.status,
+                tenantId: state.currentTenantId
+              });
+            });
+
+            showToast("Student updated!");
+          } else {
+            const id = "STU" + String(state.students.length + 1).padStart(3, "0");
+            state.students.push({
+              id,
+              name: $("sName").value,
+              email: $("sEmail").value,
+              phone: $("sPhone").value,
+              status: $("sStatus").value,
+              joinDate: new Date().toISOString().split("T")[0],
+              course: courseSummary,
+              avatar: ["🧑‍💻", "👩‍🔬", "🧑‍🎨", "👩‍💼", "👨‍💻"][Math.floor(Math.random() * 5)],
+              tenantId: state.currentTenantId,
+            });
+
+            courses.forEach(c => {
+              const start = new Date().toISOString().split("T")[0];
+              let endStr = c.endDate;
+              if (!endStr) {
+                const end = new Date(start);
+                end.setMonth(end.getMonth() + c.duration);
+                endStr = end.toISOString().split("T")[0];
+              }
+              state.subscriptions.push({
+                id: "SUB" + String(Date.now()).slice(-4) + Math.floor(Math.random()*100),
+                studentId: id,
+                planId: c.planId,
+                startDate: start,
+                endDate: endStr,
+                status: "active",
+                courseAccess: true,
+                derivedCourseName: c.course,
+                discount: c.discount,
+                tenantId: state.currentTenantId
+              });
+            });
+
+            installs.forEach(i => {
+              state.payments.push({
+                id: "PAY" + String(Date.now()).slice(-4) + Math.floor(Math.random()*100),
+                studentId: id,
+                subscriptionId: state.subscriptions.find(sub => sub.studentId === id)?.id || "",
+                installment: i.installment,
+                amount: i.amount,
+                paidAmount: i.paidAmount,
+                dueDate: i.dueDate,
+                paidDate: i.status === 'completed' ? new Date().toISOString().split("T")[0] : null,
+                status: i.status,
+                tenantId: state.currentTenantId
+              });
+            });
+            showToast("Student enrolled!");
+          }
+          $("studentModal").classList.add("hidden");
+          renderStudentTable();
+          renderBlockedList();
+        };
+      }
+
+      function renderStudentTable() {
+        const q = ($("studentSearch")?.value || "").toLowerCase();
+        const f = $("studentFilter")?.value || "";
+        const filtered = state.students.filter(
+          (s) =>
+            s.tenantId === state.currentTenantId &&
+            (!q ||
+              s.name.toLowerCase().includes(q) ||
+              s.id.toLowerCase().includes(q)) &&
+            (!f || s.status === f),
+        );
+        $("studentTableBody").innerHTML =
+          filtered
+            .map(
+              (s) => `
+    <tr class="border-b border-gray-50 hover:bg-gray-50">
+      <td class="px-4 py-3"><div class="flex items-center gap-2"><span class="text-lg">${s.avatar}</span><div><div class="font-medium text-gray-900">${s.name}</div><div class="text-xs text-gray-400">${s.id}</div></div></div></td>
+      <td class="px-4 py-3"><div class="text-gray-600">${s.email}</div><div class="text-xs text-gray-400">${s.phone}</div></td>
+      <td class="px-4 py-3 text-gray-600">${s.course}</td>
+      <td class="px-4 py-3">${statusBadge(s.status)}</td>
+      <td class="px-4 py-3">
+        <div class="flex items-center gap-1">
+          <button onclick="openProfile('${s.id}')" class="p-1.5 hover:bg-gray-200 rounded text-gray-600 transition" title="View Profile"><i data-lucide="eye" class="w-4 h-4"></i></button>
+          <button onclick="openStudentModal('${s.id}')" class="p-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded transition" title="Edit Student"><i data-lucide="edit" class="w-4 h-4"></i></button>
+          <button onclick="deleteStudent('${s.id}')" class="p-1.5 hover:bg-red-50 rounded text-gray-400 hover:text-red-500 transition" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        </div>
+      </td>
+    </tr>
+  `,
+            )
+            .join("") ||
+          '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">No students found</td></tr>';
+        lucide.createIcons();
+      }
+
+      function renderBlockedList() {
+        const blocked = state.students.filter((s) => s.status === "blocked");
+        $("blockedList").innerHTML = blocked.length
+          ? blocked
+              .map(
+                (s) => `
+    <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+      <div class="flex items-center gap-2"><span>${s.avatar}</span><div><span class="font-medium text-sm">${s.name}</span><span class="text-xs text-gray-500 ml-2">${s.id}</span></div></div>
+      <button onclick="unblockStudent('${s.id}')" class="text-xs px-3 py-1 bg-white border rounded-lg hover:bg-gray-50">Unblock</button>
+    </div>
+  `,
+              )
+              .join("")
+          : '<p class="text-sm text-gray-400">No blocked students</p>';
+      }
+
+      function openStudentModal(id) {
+        const m = $("studentModal");
+        m.classList.remove("hidden");
+        $("courseRows").innerHTML = "";
+        $("installmentRows").innerHTML = "";
+        if (id) {
+          const s = getStudent(id);
+          $("studentModalTitle").textContent = "Edit Student";
+          $("editStudentId").value = id;
+          $("sName").value = s.name;
+          $("sEmail").value = s.email;
+          $("sPhone").value = s.phone;
+          $("sStatus").value = s.status;
+          $("statusContainer").classList.remove("hidden");
+
+          // Populate existing courses
+          const subs = state.subscriptions.filter(x => x.studentId === id);
+          if(subs.length) {
+            subs.forEach(sub => {
+              addCourseRow({
+                id: sub.id,
+                startDate: sub.startDate,
+                endDate: sub.endDate,
+                course: sub.derivedCourseName || s.course.split(",")[0] || "Full Stack Development",
+                planId: sub.planId,
+                duration: getPlan(sub.planId)?.duration || 1,
+                discount: sub.discount || 0
+              });
+            });
+          } else {
+            addCourseRow();
+          }
+
+          // Populate existing installments
+          const pays = state.payments.filter(x => x.studentId === id);
+          if(pays.length) {
+            pays.forEach(p => addInstallmentRow(p));
+          } else {
+            addInstallmentRow();
+          }
+
+        } else {
+          $("studentModalTitle").textContent = "Enroll Student";
+          $("editStudentId").value = "";
+          $("statusContainer").classList.add("hidden");
+          $("sStatus").value = "active";
+          $("studentForm").reset();
+          addCourseRow();
+          addInstallmentRow();
+        }
+        lucide.createIcons();
+      }
+
+      function deleteStudent(id) {
+        // Inline confirm
+        const row = document
+          .querySelector(`button[onclick="deleteStudent('${id}')"]`)
+          .closest("tr");
+        const cell = row.querySelector("td:last-child");
+        const orig = cell.innerHTML;
+        cell.innerHTML = `<div class="flex items-center gap-1"><span class="text-xs text-red-600">Delete?</span><button onclick="confirmDelete('${id}')" class="text-xs px-2 py-1 bg-red-500 text-white rounded">Yes</button><button onclick="cancelDelete(this)" class="text-xs px-2 py-1 bg-gray-200 rounded">No</button></div>`;
+        cell._orig = orig;
+      }
+      window.confirmDelete = (id) => {
+        state.students = state.students.filter((s) => s.id !== id);
+        showToast("Student deleted", "info");
+        renderStudentTable();
+        renderBlockedList();
+      };
+      window.cancelDelete = (btn) => {
+        const cell = btn.closest("td");
+        cell.innerHTML = cell._orig;
+        lucide.createIcons();
+      };
+      window.deleteStudent = deleteStudent;
+      window.openStudentModal = openStudentModal;
+      window.unblockStudent = (id) => {
+        getStudent(id).status = "active";
+        showToast("Student unblocked!");
+        renderStudentTable();
+        renderBlockedList();
+      };
+
+      window.openProfile = (id) => {
+        state.activeProfileId = id;
+        state.currentPage = 'profile';
+        renderPage();
+        updateNav();
+      };
+
+      function renderProfilePage(el) {
+        const id = state.activeProfileId;
+        const s = getStudent(id);
+        if(!s) {
+          state.currentPage = 'students';
+          return renderPage();
+        }
+        const sub = getSub(id);
+        const plan = sub ? getPlan(sub.planId) : null;
+        const pays = getPayments(id);
+        const logs = state.activityLog.filter((a) => a.studentId === id);
+
+        el.innerHTML = `
+    <div class="max-w-5xl mx-auto pb-10">
+      <button onclick="state.currentPage='students';renderPage();updateNav();" class="flex items-center gap-2 text-sm text-gray-500 hover:text-indigo-600 mb-6 transition"><i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Students</button>
+      
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-4">
+            <span class="text-4xl bg-indigo-50 w-16 h-16 rounded-full flex items-center justify-center">${s.avatar}</span>
+            <div><h2 class="text-2xl font-bold text-gray-900">${s.name}</h2><p class="text-sm text-gray-500">${s.id} · ${s.course}</p></div>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="openStudentModal('${s.id}')" class="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg text-sm font-medium hover:bg-indigo-100 flex items-center gap-2 transition"><i data-lucide="edit" class="w-4 h-4"></i> Edit Profile</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
+        <div class="flex gap-6 border-b px-6 pt-4 text-sm overflow-x-auto" id="profileTabs">
+          ${["Profile", "Subscription", "Payments", "Activity"].map((t, i) => `<button data-ptab="${i}" class="pb-3 px-1 border-b-2 whitespace-nowrap transition-colors ${i === 0 ? "tab-active font-medium text-indigo-600 border-indigo-600" : "text-gray-500 border-transparent hover:text-gray-800"}">${t}</button>`).join("")}
+        </div>
+        <div id="profileTabContent" class="p-6"></div>
+      </div>
+    </div>
+  `;
+        lucide.createIcons();
+
+        const tabContent = [
+          `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-sm">
+      <div class="bg-gray-50 rounded-xl p-4"><span class="block text-gray-400 text-xs mb-1">Email</span><p class="font-medium text-gray-900 truncate" title="${s.email}">${s.email}</p></div>
+      <div class="bg-gray-50 rounded-xl p-4"><span class="block text-gray-400 text-xs mb-1">Phone</span><p class="font-medium text-gray-900">${s.phone}</p></div>
+      <div class="bg-gray-50 rounded-xl p-4"><span class="block text-gray-400 text-xs mb-1">Status</span><p>${statusBadge(s.status)}</p></div>
+      <div class="bg-gray-50 rounded-xl p-4"><span class="block text-gray-400 text-xs mb-1">Joined</span><p class="font-medium text-gray-900">${s.joinDate}</p></div>
+      <div class="col-span-1 sm:col-span-2 lg:col-span-4 bg-gray-50 rounded-xl p-4"><span class="block text-gray-400 text-xs mb-1">Courses Overview</span><p class="font-medium text-gray-900 leading-relaxed">${s.course}</p></div>
+    </div>`,
+          sub
+            ? `<div class="space-y-4 text-sm">
+      <div class="p-5 bg-indigo-50/50 rounded-xl border border-indigo-100">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div class="text-lg font-bold text-indigo-900">${plan?.name || "N/A"}</div>
+          ${sub.status === "expired" ? `<button onclick="extendPlan('${sub.id}')" class="text-xs px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm transition">Extend Plan</button>` : ''}
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs bg-white p-4 rounded-lg border border-indigo-50">
+          <div><span class="block text-gray-500 mb-1">Start Date</span> <span class="font-medium text-gray-900">${sub.startDate}</span></div>
+          <div><span class="block text-gray-500 mb-1">End Date</span> <span class="font-medium text-gray-900">${sub.endDate}</span></div>
+          <div><span class="block text-gray-500 mb-1">Status</span> <div>${statusBadge(sub.status)}</div></div>
+          <div><span class="block text-gray-500 mb-1">Plan Value</span> <span class="font-medium text-gray-900">${fmt(plan?.price)}</span></div>
+        </div>
+      </div>
+      <div class="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl shadow-sm">
+        <span class="text-sm font-medium text-gray-700">Platform Access Status</span>
+        <span class="px-3 py-1 bg-gray-50 rounded-full border border-gray-200">${sub.courseAccess ? "✅ Enabled" : "❌ Restricted"}</span>
+      </div>
+    </div>`
+            : '<div class="text-center py-8"><div class="text-4xl mb-3">📭</div><p class="text-gray-500 font-medium">No active subscriptions found</p><p class="text-xs text-gray-400 mt-1">Enroll this student to see plans here.</p></div>',
+          pays.length
+            ? `<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-xs text-gray-500 bg-gray-50 border-b"><th class="px-4 py-3 text-left rounded-tl-lg font-medium">Inst #</th><th class="px-4 py-3 text-left font-medium">Amount</th><th class="px-4 py-3 text-left font-medium">Paid</th><th class="px-4 py-3 text-left font-medium">Due Date</th><th class="px-4 py-3 text-left rounded-tr-lg font-medium">Status</th></tr></thead><tbody class="divide-y divide-gray-50">
+      ${pays.map((p) => `<tr><td class="px-4 py-3 text-gray-500">#${p.installment}</td><td class="px-4 py-3 font-medium text-gray-900">${fmt(p.amount)}</td><td class="px-4 py-3 font-medium ${p.paidAmount < p.amount ? 'text-amber-600':'text-emerald-600'}">${fmt(p.paidAmount)}</td><td class="px-4 py-3 text-gray-500">${p.dueDate}</td><td class="px-4 py-3">${statusBadge(p.status)}</td></tr>`).join("")}
+    </tbody></table></div>`
+            : '<div class="text-center py-8"><div class="text-4xl mb-3">💸</div><p class="text-gray-500 font-medium">No payment history</p></div>',
+          logs.length
+            ? `<div class="space-y-3 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 before:to-transparent">
+               ${logs.map((l) => `<div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                 <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-indigo-50 text-indigo-500 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm"><i data-lucide="activity" class="w-4 h-4"></i></div>
+                 <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-4 rounded-xl border border-gray-100 shadow-sm"><div class="flex items-center justify-between mb-1"><div class="font-medium text-gray-900 text-sm">${l.action}</div><time class="text-xs font-medium text-indigo-500">${l.date}</time></div></div>
+               </div>`).join("")}</div>`
+            : '<div class="text-center py-8"><div class="text-4xl mb-3">📉</div><p class="text-gray-500 font-medium">No recent profile activity</p></div>',
+        ];
+
+        $("profileTabContent").innerHTML = tabContent[0];
+        document.querySelectorAll("#profileTabs button").forEach(
+          (b) =>
+            (b.onclick = () => {
+              document
+                .querySelectorAll("#profileTabs button")
+                .forEach(
+                  (x) =>
+                    (x.className =
+                      "pb-3 px-1 border-b-2 whitespace-nowrap transition-colors text-gray-500 border-transparent hover:text-gray-800"),
+                );
+              b.className =
+                "pb-3 px-1 border-b-2 whitespace-nowrap transition-colors tab-active font-medium text-indigo-600 border-indigo-600";
+              $("profileTabContent").innerHTML =
+                tabContent[parseInt(b.dataset.ptab)];
+              lucide.createIcons();
+            }),
+        );
+      }
+      window.openProfile = openProfile;
+      window.extendPlan = (subId) => {
+        const sub = state.subscriptions.find(s => s.id === subId);
+        if (sub) {
+          const plan = getPlan(sub.planId);
+          const end = new Date(sub.endDate);
+          end.setMonth(end.getMonth() + (plan ? plan.duration : 1));
+          sub.endDate = end.toISOString().split("T")[0];
+          sub.status = "active";
+          const st = getStudent(sub.studentId);
+          if (st) st.status = "active";
+          showToast("Plan extended successfully!");
+          openProfile(sub.studentId);
+          if (state.currentPage === "students") renderStudentTable();
+          if (state.currentPage === "dashboard") renderDashboard($("mainContent"));
+        }
+      };
+
+      // ==================== SUBSCRIPTIONS ====================
+      function renderSubscriptions(el) {
+        el.innerHTML = `
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
+        <div><h1 class="text-2xl font-bold text-gray-900">Subscriptions</h1><p class="text-sm text-gray-500">Plans & student subscriptions</p></div>
+        <div class="flex gap-2">
+          <button id="addPlanBtn" class="flex items-center gap-2 px-4 py-2 bg-white border rounded-lg text-sm font-medium hover:bg-gray-50"><i data-lucide="plus" class="w-4 h-4"></i> New Plan</button>
+        </div>
+      </div>
+      <h3 class="font-semibold text-gray-900 mb-3">Plans</h3>
+      <div class="grid sm:grid-cols-3 gap-4 mb-6" id="planCards"></div>
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+        <div class="p-4 border-b flex items-center justify-between">
+          <h3 class="font-semibold text-gray-900">All Subscriptions</h3>
+          <select id="subFilter" class="px-3 py-1.5 border rounded-lg text-sm outline-none"><option value="">All</option><option value="active">Active</option><option value="expired">Expired</option></select>
+        </div>
+        <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-gray-400 text-xs border-b bg-gray-50">
+          <th class="px-4 py-3 font-medium">Student</th><th class="px-4 py-3 font-medium">Plan</th><th class="px-4 py-3 font-medium">Duration</th><th class="px-4 py-3 font-medium">Status</th><th class="px-4 py-3 font-medium">Access</th>
+        </tr></thead><tbody id="subTableBody"></tbody></table></div>
+      </div>
+    </div>
+    <div id="planModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="modal-backdrop absolute inset-0 bg-black/40" onclick="document.getElementById('planModal').classList.add('hidden')"></div>
+      <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+        <h3 class="text-lg font-bold mb-4">Create Plan</h3>
+        <form id="planForm" class="space-y-3">
+          <div><label class="block text-xs font-medium text-gray-600 mb-1">Plan Name</label><input id="pName" required class="w-full px-3 py-2 border rounded-lg text-sm outline-none"></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="block text-xs font-medium text-gray-600 mb-1">Duration (months)</label><input id="pDur" type="number" required class="w-full px-3 py-2 border rounded-lg text-sm outline-none"></div>
+            <div><label class="block text-xs font-medium text-gray-600 mb-1">Price (₹)</label><input id="pPrice" type="number" required class="w-full px-3 py-2 border rounded-lg text-sm outline-none"></div>
+          </div>
+          <div><label class="block text-xs font-medium text-gray-600 mb-1">Features (comma separated)</label><input id="pFeatures" class="w-full px-3 py-2 border rounded-lg text-sm outline-none" placeholder="Feature 1, Feature 2"></div>
+          <button type="submit" class="primary-btn w-full py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:opacity-90">Create Plan</button>
+        </form>
+      </div>
+    </div>
+
+  `;
+
+        // Plan cards
+        $("planCards").innerHTML = state.plans
+          .map(
+            (p) => `
+    <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition">
+      <div class="flex items-center justify-between mb-2"><h4 class="font-bold text-gray-900">${p.name}</h4><span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">${p.duration}mo</span></div>
+      <div class="text-2xl font-bold text-indigo-600 mb-3">${fmt(p.price)}</div>
+      <ul class="space-y-1">${p.features.map((f) => `<li class="text-xs text-gray-500 flex items-center gap-1"><i data-lucide="check" class="w-3 h-3 text-emerald-500"></i>${f}</li>`).join("")}</ul>
+    </div>
+  `,
+          )
+          .join("");
+
+        renderSubTable();
+        $("subFilter").onchange = renderSubTable;
+        $("addPlanBtn").onclick = () =>
+          $("planModal").classList.remove("hidden");
+
+
+        $("planForm").onsubmit = (e) => {
+          e.preventDefault();
+          state.plans.push({
+            id: "PLN" + String(state.plans.length + 1).padStart(3, "0"),
+            name: $("pName").value,
+            duration: +$("pDur").value,
+            price: +$("pPrice").value,
+            features: $("pFeatures")
+              .value.split(",")
+              .map((f) => f.trim())
+              .filter(Boolean),
+            status: "active",
+          });
+          $("planModal").classList.add("hidden");
+          showToast("Plan created!");
+          renderPage();
+        };
+
+
+      }
+
+      function renderSubTable() {
+        const f = $("subFilter")?.value || "";
+        const subs = state.subscriptions.filter((s) => !f || s.status === f);
+        $("subTableBody").innerHTML =
+          subs
+            .map((s) => {
+              const st = getStudent(s.studentId);
+              const pl = getPlan(s.planId);
+              return `<tr class="border-b border-gray-50 hover:bg-gray-50">
+      <td class="px-4 py-3"><span class="font-medium">${st?.name || "Unknown"}</span><span class="text-xs text-gray-400 ml-2">${s.studentId}</span></td>
+      <td class="px-4 py-3 text-gray-600">${pl?.name || "Unknown"}</td>
+      <td class="px-4 py-3 text-gray-500 text-xs">${s.startDate} → ${s.endDate}</td>
+      <td class="px-4 py-3">${statusBadge(s.status)}</td>
+      <td class="px-4 py-3">${s.courseAccess ? '<span class="text-emerald-600 text-xs">✅ Active</span>' : '<span class="text-red-500 text-xs">❌ Restricted</span>'}</td>
+    </tr>`;
+            })
+            .join("") ||
+          '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">No subscriptions</td></tr>';
+        lucide.createIcons();
+      }
+
+      // ==================== PAYMENTS ====================
+      function renderPayments(el) {
+        el.innerHTML = `
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-5"><h1 class="text-2xl font-bold text-gray-900">Payments & Installments</h1><p class="text-sm text-gray-500">Track all payment activity</p></div>
+      <div class="grid grid-cols-3 gap-4 mb-6">
+        ${[
+          {
+            label: "Total Collected",
+            value: fmt(state.payments.reduce((a, p) => a + p.paidAmount, 0)),
+            emoji: "💰",
+            bg: "bg-emerald-50",
+          },
+          {
+            label: "Pending Amount",
+            value: fmt(
+              state.payments.reduce((a, p) => a + (p.amount - p.paidAmount), 0),
+            ),
+            emoji: "⏳",
+            bg: "bg-amber-50",
+          },
+          {
+            label: "Overdue",
+            value: state.payments.filter(
+              (p) => p.status === "pending" && new Date(p.dueDate) < new Date(),
+            ).length,
+            emoji: "🔴",
+            bg: "bg-red-50",
+          },
+        ]
+          .map(
+            (k) =>
+              `<div class="stat-card ${k.bg} rounded-xl p-4 border"><span class="text-xl">${k.emoji}</span><div class="text-lg font-bold mt-1">${k.value}</div><div class="text-xs text-gray-500">${k.label}</div></div>`,
+          )
+          .join("")}
+      </div>
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+        <div class="p-4 border-b flex flex-col sm:flex-row gap-3 items-center justify-between">
+          <div class="flex-1 relative w-full sm:w-auto">
+            <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
+            <input id="paySearch" type="text" placeholder="Search by student name..." class="w-full pl-9 pr-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-200">
+          </div>
+          <select id="payFilter" class="px-3 py-2 border rounded-lg text-sm outline-none w-full sm:w-auto"><option value="">All Status</option><option value="pending">Pending</option><option value="partial">Partial</option><option value="completed">Completed</option><option value="delayed">Delayed</option></select>
+        </div>
+        <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-gray-400 text-xs border-b bg-gray-50">
+          <th class="px-4 py-3 font-medium">Student</th><th class="px-4 py-3 font-medium">#</th><th class="px-4 py-3 font-medium">Amount</th><th class="px-4 py-3 font-medium">Paid</th><th class="px-4 py-3 font-medium">Due Date</th><th class="px-4 py-3 font-medium">Status</th><th class="px-4 py-3 font-medium">Action</th>
+        </tr></thead><tbody id="payTableBody"></tbody></table></div>
+      </div>
+    </div>
+  `;
+        renderPayTable();
+        $("payFilter").onchange = renderPayTable;
+        $("paySearch").oninput = renderPayTable;
+      }
+
+      function renderPayTable() {
+        const h = ($("paySearch")?.value || "").toLowerCase();
+        const f = $("payFilter")?.value || "";
+        const pays = state.payments.filter((p) => {
+          const st = getStudent(p.studentId);
+          const tenantMatch = p.tenantId === state.currentTenantId;
+          const nameMatch = !h || (st && st.name.toLowerCase().includes(h));
+          const statusMatch = !f || p.status === f;
+          return tenantMatch && nameMatch && statusMatch;
+        });
+        $("payTableBody").innerHTML = pays
+          .map((p) => {
+            const st = getStudent(p.studentId);
+            const remaining = p.amount - p.paidAmount;
+            return `<tr class="border-b border-gray-50 hover:bg-gray-50">
+      <td class="px-4 py-3 font-medium">${st?.name || "Unknown"}</td>
+      <td class="px-4 py-3 text-gray-500">${p.installment}</td>
+      <td class="px-4 py-3">${fmt(p.amount)}</td>
+      <td class="px-4 py-3 ${p.paidAmount < p.amount ? "text-amber-600" : "text-emerald-600"}">${fmt(p.paidAmount)}</td>
+      <td class="px-4 py-3 text-gray-500">${p.dueDate}</td>
+      <td class="px-4 py-3">${statusBadge(p.status)}</td>
+      <td class="px-4 py-3">
+        <div class="flex items-center gap-2">
+          ${p.status !== "completed" ? `<button onclick="markPaid('${p.id}')" class="text-xs px-2 py-1 bg-emerald-600 text-white rounded hover:bg-emerald-700 whitespace-nowrap">Mark Paid</button>` : '<span class="text-xs text-gray-400 inline-block w-[66px] text-center">—</span>'}
+          <button onclick="openProfile('${p.studentId}'); setTimeout(() => document.querySelector('#profileTabs button[data-ptab=\\'2\\']').click(), 0);" class="p-1.5 hover:bg-gray-200 rounded text-gray-500 hover:text-gray-700 transition" title="View History"><i data-lucide="eye" class="w-4 h-4"></i></button>
+        </div>
+      </td>
+    </tr>`;
+          })
+          .join("");
+        lucide.createIcons();
+      }
+      window.markPaid = (id) => {
+        const p = state.payments.find((x) => x.id === id);
+        p.paidAmount = p.amount;
+        p.status = "completed";
+        p.paidDate = new Date().toISOString().split("T")[0];
+        showToast("Payment marked as completed!");
+        renderPayTable();
+      };
+
+
+
+      // ==================== SETTINGS ====================
+      function renderSettings(el) {
+        el.innerHTML = `
+    <div class="max-w-2xl mx-auto">
+      <div class="mb-5"><h1 class="text-2xl font-bold text-gray-900">Settings</h1><p class="text-sm text-gray-500">System configuration</p></div>
+      <div class="space-y-4">
+        <div class="bg-white rounded-xl p-5 border shadow-sm">
+          <h3 class="font-semibold mb-4">Institution Details</h3>
+          <form id="settingsForm" class="space-y-3">
+            <div><label class="block text-xs font-medium text-gray-600 mb-1">Institution Name</label><input value="${appConfig.company_name}" class="w-full px-3 py-2 border rounded-lg text-sm outline-none" id="setName"></div>
+            <div><label class="block text-xs font-medium text-gray-600 mb-1">Admin Email</label><input value="admin@edutrack.com" class="w-full px-3 py-2 border rounded-lg text-sm outline-none"></div>
+            <div><label class="block text-xs font-medium text-gray-600 mb-1">Timezone</label>
+              <select class="w-full px-3 py-2 border rounded-lg text-sm outline-none"><option>Asia/Kolkata (IST)</option><option>America/New_York (EST)</option><option>Europe/London (GMT)</option></select></div>
+            <button type="submit" class="primary-btn px-6 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:opacity-90">Save Changes</button>
+          </form>
+        </div>
+        <div class="bg-white rounded-xl p-5 border shadow-sm">
+          <h3 class="font-semibold mb-4">Notification Preferences</h3>
+          <div class="space-y-3">
+            ${[
+              "Payment reminders",
+              "Subscription expiry alerts",
+              "New enrollment notifications",
+              "Weekly reports",
+            ]
+              .map(
+                (n, i) => `
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-700">${n}</span>
+                <button onclick="this.dataset.on=this.dataset.on==='true'?'false':'true';this.className='relative inline-flex h-6 w-11 items-center rounded-full transition-colors '+(this.dataset.on==='true'?'bg-emerald-500':'bg-gray-300');this.firstElementChild.className='inline-block h-4 w-4 transform rounded-full bg-white transition-transform '+(this.dataset.on==='true'?'translate-x-6':'translate-x-1')" data-on="${i < 3}" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${i < 3 ? "bg-emerald-500" : "bg-gray-300"}">
+                  <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${i < 3 ? "translate-x-6" : "translate-x-1"}"></span>
+                </button>
+              </div>
+            `,
+              )
+              .join("")}
+          </div>
+        </div>
+        <div class="bg-white rounded-xl p-5 border shadow-sm">
+          <h3 class="font-semibold mb-2 text-red-600">Danger Zone</h3>
+          <p class="text-sm text-gray-500 mb-3">These actions are irreversible.</p>
+          <button onclick="showToast('This is a demo — no data was cleared','info')" class="px-4 py-2 border border-red-300 text-red-600 rounded-lg text-sm hover:bg-red-50">Reset All Data</button>
+        </div>
+      </div>
+    </div>
+  `;
+        $("settingsForm").onsubmit = (e) => {
+          e.preventDefault();
+          showToast("Settings saved!");
+        };
+        lucide.createIcons();
+      }
+
+      // ==================== INIT ====================
+      render();
+    </script>
+    <script>
+      (function () {
+        function c() {
+          var b = a.contentDocument || a.contentWindow.document;
+          if (b) {
+            var d = b.createElement("script");
+            d.innerHTML =
+              "window.__CF$cv$params={r:'9e2bd4a160ed6145',t:'MTc3NDU4NzYxOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName("head")[0].appendChild(d);
+          }
+        }
+        if (document.body) {
+          var a = document.createElement("iframe");
+          a.height = 1;
+          a.width = 1;
+          a.style.position = "absolute";
+          a.style.top = 0;
+          a.style.left = 0;
+          a.style.border = "none";
+          a.style.visibility = "hidden";
+          document.body.appendChild(a);
+          if ("loading" !== document.readyState) c();
+          else if (window.addEventListener)
+            document.addEventListener("DOMContentLoaded", c);
+          else {
+            var e = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (b) {
+              e(b);
+              "loading" !== document.readyState &&
+                ((document.onreadystatechange = e), c());
+            };
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
