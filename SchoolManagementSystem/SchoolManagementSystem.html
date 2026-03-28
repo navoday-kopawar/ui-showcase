@@ -11,7 +11,7 @@
 
   
     
-    <title>Dashboar | School Management System</title>
+    <title>SMS | School Management System</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
     <link
@@ -712,7 +712,7 @@
           <span
             class="logo-text font-bold text-base text-surface-900"
             id="platformNameSidebar"
-            >Tipic</span
+            >S-M-S</span
           >
         </div>
         <div class="flex-1 overflow-y-auto py-3" id="sidebarNav"></div>
@@ -1150,20 +1150,20 @@
         ],
         contacts: [
           // School 0 members
-          { schoolId: 0, type: "Principal", name: "Robert Miller", role: "School Principal", dept: "Admin", class: "", phone: "+1 555-0100", email: "principal@tipic.edu" },
+          { schoolId: 0, type: "Principal", name: "Robert Miller", role: "School Principal", dept: "Admin", class: "", phone: "+1 555-0100", email: "principal@sms.edu" },
           { schoolId: 0, type: "Teacher", name: "Dr. Sarah Parker", role: "Senior Math Teacher", dept: "Mathematics", class: "10-A", phone: "+1 555-0201", email: "sarah@school.com" },
           { schoolId: 0, type: "Teacher", name: "John Mitchell", role: "Science Dept Head", dept: "Science", class: "11-A", phone: "+1 555-0202", email: "john@school.com" },
           { schoolId: 0, type: "Student", name: "Alice Johnson", role: "Student Rep", dept: "Academics", class: "10-A", phone: "+1 555-0101", email: "alice@student.com" },
           { schoolId: 0, type: "Parent", name: "Robert Johnson", role: "PTA Chairman", dept: "Parent Council", class: "10-A", phone: "+1 555-0101", email: "robert@parent.com" },
           
           // School 1 members
-          { schoolId: 1, type: "Principal", name: "Linda Thompson", role: "Principal", dept: "Admin", class: "", phone: "+1 555-1100", email: "principal1@tipic.edu" },
+          { schoolId: 1, type: "Principal", name: "Linda Thompson", role: "Principal", dept: "Admin", class: "", phone: "+1 555-1100", email: "principal1@sms.edu" },
           { schoolId: 1, type: "Teacher", name: "Lisa Chen", role: "English Teacher", dept: "English", class: "9-A", phone: "+1 555-1201", email: "lisa@school.com" },
           { schoolId: 1, type: "Student", name: "Bob Smith", role: "Class Rep", dept: "Academics", class: "12-B", phone: "+1 555-1301", email: "bob@student.com" },
           
           // School 2 members
-          { schoolId: 2, type: "Principal", name: "Mark Wilson", role: "Principal", dept: "Admin", class: "", phone: "+1 555-2100", email: "principal2@tipic.edu" },
-          { schoolId: 2, type: "Admin", name: "Office Desk", role: "Admin Assistant", dept: "Operations", class: "", phone: "+1 555-2200", email: "admin2@tipic.edu" }
+          { schoolId: 2, type: "Principal", name: "Mark Wilson", role: "Principal", dept: "Admin", class: "", phone: "+1 555-2100", email: "principal2@sms.edu" },
+          { schoolId: 2, type: "Admin", name: "Office Desk", role: "Admin Assistant", dept: "Operations", class: "", phone: "+1 555-2200", email: "admin2@sms.edu" }
         ],
         contactSchoolFilter: "All",
         contactDeptFilter: "All",
@@ -1212,7 +1212,7 @@
       // ========================= CONFIG =========================
       const defaultConfig = {
         school_name: "Springfield Academy",
-        platform_name: "Tipic",
+        platform_name: "sms",
         background_color: "#f8fafc",
         surface_color: "#ffffff",
         text_color: "#0f172a",
@@ -1632,7 +1632,7 @@
               <i data-lucide="building-2" class="w-8 h-8 text-white"></i>
             </div>
             <h1 class="text-2xl font-bold text-surface-900 font-display">Register Your School</h1>
-            <p class="text-sm text-surface-500 mt-1">Get started with Tipic</p>
+            <p class="text-sm text-surface-500 mt-1">Get started with sms</p>
           </div>
           <form onsubmit="event.preventDefault();toast('School registered successfully!');showScreen('login');">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1669,7 +1669,7 @@
       function renderSuperAdminDash() {
         const s = state.schools[state.school];
         return `
-    <div class="mb-6 animate-in"><h1 class="text-2xl font-bold text-surface-900 font-display">Tipic Consultect Business Dashboard</h1><p class="text-surface-500 text-sm mt-1">Super Admin Platform Overview</p></div>
+    <div class="mb-6 animate-in"><h1 class="text-2xl font-bold text-surface-900 font-display">sms Consultect Business Dashboard</h1><p class="text-surface-500 text-sm mt-1">Super Admin Platform Overview</p></div>
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       ${statCard("building-2", "Participating Schools", state.schools.length, "#6366f1", 1)}
       ${statCard("credit-card", "Active Subscriptions", state.schools.length, "#22c55e", 2)}
@@ -3040,7 +3040,7 @@
 
           // ---- SUBSCRIPTION AND REVENUE ----
           subscription_plans: () => 
-            pageHeader("Subscription Plans", "Manage Tipic software plans and school subscriptions") +
+            pageHeader("Subscription Plans", "Manage sms software plans and school subscriptions") +
             `<div class="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in delay-1">
               ${[
                 {name: "Basic Plan", desc: "For small schools", price: "$299/mo", schools: 1, features: ["Up to 500 Students", "Basic Reporting", "Email Support"]},
@@ -3064,7 +3064,7 @@
             </div>`,
 
           revenue_tracking: () =>
-            pageHeader("Revenue Tracking", "Financial analytics for Tipic platform") +
+            pageHeader("Revenue Tracking", "Financial analytics for sms platform") +
             `<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in delay-1">
               <div class="card lg:col-span-2">
                 <div class="flex items-center justify-between mb-6">
@@ -3247,7 +3247,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 animate-in delay-1">
         <div class="card">
           <h3 class="font-bold text-surface-800 mb-4">General</h3>
-          <div class="form-group"><label class="form-label">Platform Name</label><input class="form-input" value="Tipic"></div>
+          <div class="form-group"><label class="form-label">Platform Name</label><input class="form-input" value="sms"></div>
           <div class="form-group"><label class="form-label">Timezone</label><select class="form-input"><option>UTC-5 (Eastern)</option><option>UTC-6 (Central)</option><option>UTC-8 (Pacific)</option></select></div>
           <div class="form-group"><label class="form-label">Language</label><select class="form-input"><option>English</option><option>Spanish</option><option>French</option></select></div>
           <button class="btn btn-primary" onclick="toast('Settings saved!')">Save</button>
