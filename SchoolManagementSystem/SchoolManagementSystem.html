@@ -1,0 +1,3322 @@
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tipic - School Management System</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Playfair+Display:wght@600;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: "#eef2ff",
+                100: "#e0e7ff",
+                200: "#c7d2fe",
+                300: "#a5b4fc",
+                400: "#818cf8",
+                500: "#6366f1",
+                600: "#4f46e5",
+                700: "#4338ca",
+                800: "#3730a3",
+                900: "#312e81",
+              },
+              surface: {
+                50: "#f8fafc",
+                100: "#f1f5f9",
+                200: "#e2e8f0",
+                300: "#cbd5e1",
+                400: "#94a3b8",
+                500: "#64748b",
+                600: "#475569",
+                700: "#334155",
+                800: "#1e293b",
+                900: "#0f172a",
+              },
+              success: { 500: "#22c55e", 600: "#16a34a" },
+              warning: { 500: "#f59e0b", 600: "#d97706" },
+              danger: { 500: "#ef4444", 600: "#dc2626" },
+            },
+            fontFamily: {
+              sans: ["DM Sans", "sans-serif"],
+              display: ["Playfair Display", "serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        font-family: "DM Sans", sans-serif;
+        overflow: hidden;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      .poster-card {
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+      .poster-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+      }
+
+      .dropdown-panel {
+        animation: dropDown 0.2s ease;
+        transform-origin: top;
+        z-index: 50;
+      }
+      @keyframes dropDown {
+        from {
+          opacity: 0;
+          transform: scaleY(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scaleY(1);
+        }
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+      }
+
+      .color-swatch {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease;
+        border: 2px solid transparent;
+      }
+      .color-swatch:hover {
+        transform: scale(1.15);
+      }
+      .color-swatch.active {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.3);
+      }
+
+      .icon-option {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s ease;
+        border: 2px solid transparent;
+        background: #f1f5f9;
+      }
+      .icon-option:hover {
+        background: #e2e8f0;
+      }
+      .icon-option.active {
+        border-color: #4f46e5;
+        background: #e2e8f0;
+      }
+
+      .toast-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .toast {
+        padding: 12px 20px;
+        border-radius: 12px;
+        color: #fff;
+        background: #1e293b;
+        font-weight: 600;
+        font-size: 13px;
+        animation:
+          slideInRight 0.3s ease,
+          fadeOut 0.3s ease 2.5s forwards;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      @keyframes slideInRight {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      @keyframes fadeOut {
+        to {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+      }
+
+      .sidebar {
+        width: 260px;
+        transition:
+          transform 0.3s ease,
+          width 0.3s ease;
+      }
+
+      .sidebar.collapsed {
+        width: 70px;
+      }
+
+      .sidebar.collapsed .nav-text,
+      .sidebar.collapsed .logo-text,
+      .sidebar.collapsed .nav-group-title {
+        display: none;
+      }
+
+      .sidebar.collapsed .nav-item {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      .sidebar.collapsed .nav-icon {
+        margin-right: 0;
+      }
+
+      @media (max-width: 1024px) {
+        .sidebar {
+          position: fixed;
+          z-index: 50;
+          transform: translateX(-100%);
+        }
+
+        .sidebar.open {
+          transform: translateX(0);
+        }
+      }
+
+      .main-content {
+        transition: margin-left 0.3s ease;
+      }
+
+      @media (max-width: 1024px) {
+        .main-content {
+          margin-left: 0 !important;
+        }
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        color: #64748b;
+        font-size: 14px;
+        font-weight: 500;
+        margin: 2px 8px;
+      }
+
+      .nav-item:hover {
+        background: #eef2ff;
+        color: #4f46e5;
+      }
+
+      .nav-item.active {
+        background: #4f46e5;
+        color: #fff;
+      }
+
+      .nav-item.active svg {
+        color: #fff;
+      }
+
+      .nav-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+        flex-shrink: 0;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        padding: 20px;
+        transition: box-shadow 0.2s ease;
+      }
+
+      .card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      }
+
+      .stat-card {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stat-card::after {
+        content: "";
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        opacity: 0.1;
+      }
+
+      .btn {
+        padding: 8px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: none;
+      }
+
+      .btn-primary {
+        background: #4f46e5;
+        color: #fff;
+      }
+
+      .btn-primary:hover {
+        background: #4338ca;
+      }
+
+      .btn-success {
+        background: #22c55e;
+        color: #fff;
+      }
+
+      .btn-success:hover {
+        background: #16a34a;
+      }
+
+      .btn-danger {
+        background: #ef4444;
+        color: #fff;
+      }
+
+      .btn-danger:hover {
+        background: #dc2626;
+      }
+
+      .btn-outline {
+        background: transparent;
+        color: #4f46e5;
+        border: 1.5px solid #c7d2fe;
+      }
+
+      .btn-outline:hover {
+        background: #eef2ff;
+      }
+
+      .btn-ghost {
+        background: transparent;
+        color: #64748b;
+      }
+
+      .btn-ghost:hover {
+        background: #f1f5f9;
+      }
+
+      .badge {
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+
+      .badge-success {
+        background: #dcfce7;
+        color: #16a34a;
+      }
+
+      .badge-warning {
+        background: #fef3c7;
+        color: #d97706;
+      }
+
+      .badge-danger {
+        background: #fee2e2;
+        color: #dc2626;
+      }
+
+      .badge-info {
+        background: #e0e7ff;
+        color: #4f46e5;
+      }
+
+      .table-container {
+        overflow-x: auto;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+      }
+
+      .table-container table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .table-container th {
+        background: #f8fafc;
+        padding: 12px 16px;
+        text-align: left;
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .table-container td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 14px;
+        color: #334155;
+      }
+
+      .table-container tr:hover td {
+        background: #f8fafc;
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 6px;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #334155;
+        transition: border-color 0.15s;
+        font-family: inherit;
+        background: #fff;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: #818cf8;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      }
+
+      select.form-input {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+      }
+
+      textarea.form-input {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 60;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+      }
+
+      .overlay.show {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .modal {
+        background: #fff;
+        border-radius: 16px;
+        padding: 24px;
+        max-width: 560px;
+        width: 90%;
+        max-height: 85%;
+        overflow-y: auto;
+        transform: scale(0.95);
+        transition: transform 0.2s;
+      }
+
+      .overlay.show .modal {
+        transform: scale(1);
+      }
+
+      .toast-container {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .toast {
+        padding: 12px 20px;
+        border-radius: 10px;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+        animation: slideIn 0.3s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+        color: #fff;
+        flex-shrink: 0;
+      }
+
+      .tab-bar {
+        display: flex;
+        gap: 4px;
+        background: #f1f5f9;
+        border-radius: 10px;
+        padding: 4px;
+      }
+
+      .tab-item {
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        color: #64748b;
+        transition: all 0.15s;
+      }
+
+      .tab-item.active {
+        background: #fff;
+        color: #4f46e5;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      }
+
+      .progress-bar {
+        height: 8px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.5s ease;
+      }
+
+      .chat-bubble {
+        max-width: 75%;
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .chat-sent {
+        background: #4f46e5;
+        color: #fff;
+        border-bottom-right-radius: 4px;
+        margin-left: auto;
+      }
+
+      .chat-received {
+        background: #f1f5f9;
+        color: #334155;
+        border-bottom-left-radius: 4px;
+      }
+
+      .dropdown {
+        position: relative;
+        display: inline-block;
+      }
+
+      .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: #fff;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        padding: 6px;
+        min-width: 180px;
+        z-index: 40;
+        display: none;
+      }
+
+      .dropdown-menu.show {
+        display: block;
+      }
+
+      .dropdown-item {
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        cursor: pointer;
+        color: #334155;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .dropdown-item:hover {
+        background: #f1f5f9;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-in {
+        animation: fadeUp 0.4s ease forwards;
+      }
+
+      .delay-1 {
+        animation-delay: 0.05s;
+        opacity: 0;
+      }
+
+      .delay-2 {
+        animation-delay: 0.1s;
+        opacity: 0;
+      }
+
+      .delay-3 {
+        animation-delay: 0.15s;
+        opacity: 0;
+      }
+
+      .delay-4 {
+        animation-delay: 0.2s;
+        opacity: 0;
+      }
+    </style>
+    <style>
+      body {
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+
+  <body class="h-full bg-surface-50">
+    <div id="app" class="h-full flex">
+      <!-- Sidebar -->
+      <aside
+        id="sidebar"
+        class="sidebar h-full bg-white border-r border-surface-200 flex flex-col overflow-hidden"
+      >
+        <div class="p-4 flex items-center gap-3 border-b border-surface-100">
+          <div
+            class="w-9 h-9 rounded-lg bg-brand-500 flex items-center justify-center flex-shrink-0"
+          >
+            <i data-lucide="graduation-cap" class="w-5 h-5 text-white"></i>
+          </div>
+          <span
+            class="logo-text font-bold text-base text-surface-900"
+            id="platformNameSidebar"
+            >Tipic</span
+          >
+        </div>
+        <div class="flex-1 overflow-y-auto py-3" id="sidebarNav"></div>
+        <div class="p-3 border-t border-surface-100">
+          <div class="nav-item" onclick="showScreen('settings')">
+            <i data-lucide="settings" class="nav-icon"></i
+            ><span class="nav-text">Settings</span>
+          </div>
+        </div>
+      </aside>
+      <!-- Mobile overlay -->
+      <div
+        id="sidebarOverlay"
+        class="fixed inset-0 bg-black/30 z-40 hidden lg:hidden"
+        onclick="toggleSidebar()"
+      ></div>
+      <!-- Main -->
+      <div
+        class="main-content flex-1 flex flex-col h-full overflow-hidden"
+        id="mainContent"
+      >
+        <!-- Top Navbar -->
+        <header
+          class="h-14 bg-white border-b border-surface-200 flex items-center px-4 gap-3 flex-shrink-0"
+        >
+          <button
+            class="lg:hidden p-1.5 rounded-lg hover:bg-surface-100"
+            onclick="toggleSidebar()"
+          >
+            <i data-lucide="menu" class="w-5 h-5 text-surface-600"></i>
+          </button>
+          <button
+            class="hidden lg:block p-1.5 rounded-lg hover:bg-surface-100"
+            onclick="toggleCollapse()"
+          >
+            <i data-lucide="panel-left" class="w-5 h-5 text-surface-500"></i>
+          </button>
+          <!-- School Selector -->
+          <div class="dropdown ml-1" id="schoolSelectorWrap">
+            <button
+              class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-surface-200 hover:border-brand-300 text-sm font-medium text-surface-700"
+              onclick="toggleDropdown('schoolDrop')"
+            >
+              <i data-lucide="building-2" class="w-4 h-4 text-brand-500"></i>
+              <span id="selectedSchoolName">Springfield Academy</span>
+              <i
+                data-lucide="chevron-down"
+                class="w-3.5 h-3.5 text-surface-400"
+              ></i>
+            </button>
+            <div class="dropdown-menu" id="schoolDrop">
+              <div class="dropdown-item" onclick="selectSchool(0)">
+                🏫 Springfield Academy
+              </div>
+              <div class="dropdown-item" onclick="selectSchool(1)">
+                🎓 Riverside High School
+              </div>
+              <div class="dropdown-item" onclick="selectSchool(2)">
+                📚 Oakwood International
+              </div>
+            </div>
+          </div>
+          <div class="flex-1"></div>
+          <!-- Search -->
+          <div
+            class="hidden md:flex items-center bg-surface-50 rounded-lg px-3 py-1.5 border border-surface-200 w-56"
+          >
+            <i data-lucide="search" class="w-4 h-4 text-surface-400 mr-2"></i>
+            <input
+              type="text"
+              placeholder="Search..."
+              class="bg-transparent border-none outline-none text-sm text-surface-700 w-full"
+            />
+          </div>
+          <button class="relative p-2 rounded-lg hover:bg-surface-100">
+            <i data-lucide="bell" class="w-5 h-5 text-surface-500"></i
+            ><span
+              class="absolute top-1 right-1 w-2 h-2 bg-danger-500 rounded-full"
+            ></span>
+          </button>
+          <!-- Role Switcher -->
+          <div class="dropdown">
+            <button
+              class="flex items-center gap-2 p-1 rounded-lg hover:bg-surface-100"
+              onclick="toggleDropdown('roleDrop')"
+            >
+              <div class="avatar bg-brand-500" id="avatarEl">SA</div>
+              <div class="hidden sm:block text-left">
+                <div
+                  class="text-xs font-semibold text-surface-800"
+                  id="userNameEl"
+                >
+                  Admin User
+                </div>
+                <div class="text-[10px] text-surface-400" id="userRoleEl">
+                  Super Admin
+                </div>
+              </div>
+            </button>
+            <div class="dropdown-menu" id="roleDrop">
+              <div
+                class="dropdown-item font-semibold text-xs text-surface-400 pointer-events-none"
+              >
+                Switch Role
+              </div>
+              <div class="dropdown-item" onclick="switchRole('super_admin')">
+                👑 Super Admin
+              </div>
+              <div class="dropdown-item" onclick="switchRole('school_admin')">
+                🏫 School Admin
+              </div>
+              <div class="dropdown-item" onclick="switchRole('staff')">
+                🧑‍🏫 Staff
+              </div>
+              <div class="dropdown-item" onclick="switchRole('parent')">
+                👨‍👩‍👧 Parent
+              </div>
+              <div class="dropdown-item" onclick="switchRole('student')">
+                🎒 Student
+              </div>
+              <hr class="my-1 border-surface-100" />
+              <div
+                class="dropdown-item text-danger-500"
+                onclick="showScreen('login')"
+              >
+                <i data-lucide="log-out" class="w-4 h-4"></i>Logout
+              </div>
+            </div>
+          </div>
+        </header>
+        <!-- Page Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6" id="pageContent"></main>
+      </div>
+    </div>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+    <!-- Modal Overlay -->
+    <div class="overlay" id="modalOverlay" onclick="event.target===this && closeModal()">
+      <div class="modal" id="modalContent"></div>
+    </div>
+    <!-- Auth Screens (shown separately) -->
+    <div
+      id="authScreen"
+      class="h-full w-full hidden"
+      style="
+        background: linear-gradient(
+          135deg,
+          #312e81 0%,
+          #4f46e5 50%,
+          #818cf8 100%
+        );
+      "
+    ></div>
+    <script>
+      // ========================= STATE =========================
+      const state = {
+        role: "super_admin",
+        screen: "dashboard",
+        school: 0,
+        sidebarOpen: false,
+        collapsed: false,
+        schools: [
+          {
+            name: "Springfield Academy",
+            logo: "🏫",
+            students: 1240,
+            staff: 86,
+            revenue: "$245K",
+            attendance: "94%",
+          },
+          {
+            name: "Riverside High School",
+            logo: "🎓",
+            students: 890,
+            staff: 62,
+            revenue: "$178K",
+            attendance: "91%",
+          },
+          {
+            name: "Oakwood International",
+            logo: "📚",
+            students: 2100,
+            staff: 145,
+            revenue: "$520K",
+            attendance: "96%",
+          },
+        ],
+        students: [
+          {
+            id: "STU001",
+            name: "Alice Johnson",
+            class: "10-A",
+            gender: "F",
+            status: "active",
+            parent: "Robert Johnson",
+            phone: "555-0101",
+            email: "alice@mail.com",
+            avatar: "#6366f1",
+          },
+          {
+            id: "STU002",
+            name: "Bob Smith",
+            class: "10-B",
+            gender: "M",
+            status: "active",
+            parent: "Mary Smith",
+            phone: "555-0102",
+            email: "bob@mail.com",
+            avatar: "#22c55e",
+          },
+          {
+            id: "STU003",
+            name: "Carol Davis",
+            class: "9-A",
+            gender: "F",
+            status: "active",
+            parent: "James Davis",
+            phone: "555-0103",
+            email: "carol@mail.com",
+            avatar: "#f59e0b",
+          },
+          {
+            id: "STU004",
+            name: "David Wilson",
+            class: "11-A",
+            gender: "M",
+            status: "inactive",
+            parent: "Linda Wilson",
+            phone: "555-0104",
+            email: "david@mail.com",
+            avatar: "#ef4444",
+          },
+          {
+            id: "STU005",
+            name: "Emma Brown",
+            class: "10-A",
+            gender: "F",
+            status: "active",
+            parent: "Tom Brown",
+            phone: "555-0105",
+            email: "emma@mail.com",
+            avatar: "#8b5cf6",
+          },
+        ],
+        staff: [
+          {
+            id: "STF001",
+            name: "Dr. Sarah Parker",
+            dept: "Mathematics",
+            role: "Teacher",
+            status: "active",
+            phone: "555-0201",
+            email: "sarah@school.com",
+            avatar: "#ec4899",
+          },
+          {
+            id: "STF002",
+            name: "John Mitchell",
+            dept: "Science",
+            role: "Teacher",
+            status: "active",
+            phone: "555-0202",
+            email: "john@school.com",
+            avatar: "#3b82f6",
+          },
+          {
+            id: "STF003",
+            name: "Lisa Chen",
+            dept: "English",
+            role: "Teacher",
+            status: "active",
+            phone: "555-0203",
+            email: "lisa@school.com",
+            avatar: "#14b8a6",
+          },
+          {
+            id: "STF004",
+            name: "Mark Thompson",
+            dept: "Admin",
+            role: "Non-Teaching",
+            status: "active",
+            phone: "555-0204",
+            email: "mark@school.com",
+            avatar: "#f97316",
+          },
+        ],
+        notices: [
+          {
+            id: 1,
+            title: "Annual Sports Day 2025",
+            content: "Annual sports day will be held on Feb 15th. All students must participate.",
+            color: "0",
+            icon: "megaphone",
+            audience_all: true,
+            audience_students: true,
+            audience_parents: true,
+            audience_staff: true,
+            pinned: true,
+            date: "2025-02-15",
+          },
+          {
+            id: 2,
+            title: "Parent-Teacher Meeting",
+            content: "PTM scheduled for all classes to discuss academic progress.",
+            color: "3",
+            icon: "bell",
+            audience_all: false,
+            audience_students: false,
+            audience_parents: true,
+            audience_staff: true,
+            parent_type: "all-parents",
+            pinned: false,
+            date: "2025-02-20",
+          },
+          {
+            id: 3,
+            title: "Winter Holiday Notice",
+            content: "School will remain closed for winter break from Feb 10th.",
+            color: "4",
+            icon: "alert-triangle",
+            audience_all: true,
+            audience_students: true,
+            audience_parents: true,
+            audience_staff: true,
+            pinned: false,
+            date: "2025-02-10",
+          },
+        ],
+        selectedNoticeColor: 0,
+        selectedNoticeIcon: 0,
+        noticeFormAudiences: {
+          all: false,
+          students: false,
+          parents: false,
+          staff: false
+        },
+        classes: ["9-A", "9-B", "10-A", "10-B", "11-A", "11-B", "12-A", "12-B"],
+        subjects: [
+          "Mathematics",
+          "Science",
+          "English",
+          "History",
+          "Geography",
+          "Physics",
+          "Chemistry",
+          "Biology",
+        ],
+        attendance: {},
+        fees: [
+          {
+            id: "FEE001",
+            student: "Alice Johnson",
+            class: "10-A",
+            amount: 5000,
+            paid: 5000,
+            status: "paid",
+            date: "2025-01-15",
+          },
+          {
+            id: "FEE002",
+            student: "Bob Smith",
+            class: "10-B",
+            amount: 5000,
+            paid: 3000,
+            status: "partial",
+            date: "2025-01-20",
+          },
+          {
+            id: "FEE003",
+            student: "Carol Davis",
+            class: "9-A",
+            amount: 4500,
+            paid: 0,
+            status: "unpaid",
+            date: "",
+          },
+          {
+            id: "FEE004",
+            student: "David Wilson",
+            class: "11-A",
+            amount: 5500,
+            paid: 5500,
+            status: "paid",
+            date: "2025-01-10",
+          },
+        ],
+        events: [
+          {
+            id: 1,
+            title: "Annual Sports Day",
+            date: "2025-02-15",
+            type: "Sports",
+            desc: "Inter-house athletics competition",
+          },
+          {
+            id: 2,
+            title: "Science Exhibition",
+            date: "2025-03-01",
+            type: "Academic",
+            desc: "Student project showcase",
+          },
+          {
+            id: 3,
+            title: "Cultural Fest",
+            date: "2025-03-20",
+            type: "Cultural",
+            desc: "Music, dance and drama performances",
+          },
+        ],
+        homework: [
+          {
+            id: 1,
+            subject: "Mathematics",
+            class: "10-A",
+            title: "Chapter 5 Exercises",
+            due: "2025-02-12",
+            status: "active",
+          },
+          {
+            id: 2,
+            subject: "English",
+            class: "10-A",
+            title: "Essay Writing",
+            due: "2025-02-14",
+            status: "active",
+          },
+          {
+            id: 3,
+            subject: "Science",
+            class: "9-A",
+            title: "Lab Report",
+            due: "2025-02-11",
+            status: "completed",
+          },
+        ],
+        contacts: [
+          // School 0 members
+          { schoolId: 0, type: "Principal", name: "Robert Miller", role: "School Principal", dept: "Admin", class: "", phone: "+1 555-0100", email: "principal@tipic.edu" },
+          { schoolId: 0, type: "Teacher", name: "Dr. Sarah Parker", role: "Senior Math Teacher", dept: "Mathematics", class: "10-A", phone: "+1 555-0201", email: "sarah@school.com" },
+          { schoolId: 0, type: "Teacher", name: "John Mitchell", role: "Science Dept Head", dept: "Science", class: "11-A", phone: "+1 555-0202", email: "john@school.com" },
+          { schoolId: 0, type: "Student", name: "Alice Johnson", role: "Student Rep", dept: "Academics", class: "10-A", phone: "+1 555-0101", email: "alice@student.com" },
+          { schoolId: 0, type: "Parent", name: "Robert Johnson", role: "PTA Chairman", dept: "Parent Council", class: "10-A", phone: "+1 555-0101", email: "robert@parent.com" },
+          
+          // School 1 members
+          { schoolId: 1, type: "Principal", name: "Linda Thompson", role: "Principal", dept: "Admin", class: "", phone: "+1 555-1100", email: "principal1@tipic.edu" },
+          { schoolId: 1, type: "Teacher", name: "Lisa Chen", role: "English Teacher", dept: "English", class: "9-A", phone: "+1 555-1201", email: "lisa@school.com" },
+          { schoolId: 1, type: "Student", name: "Bob Smith", role: "Class Rep", dept: "Academics", class: "12-B", phone: "+1 555-1301", email: "bob@student.com" },
+          
+          // School 2 members
+          { schoolId: 2, type: "Principal", name: "Mark Wilson", role: "Principal", dept: "Admin", class: "", phone: "+1 555-2100", email: "principal2@tipic.edu" },
+          { schoolId: 2, type: "Admin", name: "Office Desk", role: "Admin Assistant", dept: "Operations", class: "", phone: "+1 555-2200", email: "admin2@tipic.edu" }
+        ],
+        contactSchoolFilter: "All",
+        contactDeptFilter: "All",
+        contactClassFilter: "All",
+        contactRoleFilter: "All",
+        contactSearch: "",
+        timetable: {
+          Monday: [
+            { time: "8:00", subject: "Math", teacher: "Dr. Parker" },
+            { time: "9:00", subject: "English", teacher: "Ms. Chen" },
+            { time: "10:00", subject: "Break", teacher: "" },
+            { time: "10:30", subject: "Science", teacher: "Mr. Mitchell" },
+            { time: "11:30", subject: "History", teacher: "Mrs. Adams" },
+          ],
+          Tuesday: [
+            { time: "8:00", subject: "Science", teacher: "Mr. Mitchell" },
+            { time: "9:00", subject: "Math", teacher: "Dr. Parker" },
+            { time: "10:00", subject: "Break", teacher: "" },
+            { time: "10:30", subject: "Geography", teacher: "Mr. Lee" },
+            { time: "11:30", subject: "English", teacher: "Ms. Chen" },
+          ],
+          Wednesday: [
+            { time: "8:00", subject: "English", teacher: "Ms. Chen" },
+            { time: "9:00", subject: "Physics", teacher: "Mr. Mitchell" },
+            { time: "10:00", subject: "Break", teacher: "" },
+            { time: "10:30", subject: "Math", teacher: "Dr. Parker" },
+            { time: "11:30", subject: "Chemistry", teacher: "Mrs. Ross" },
+          ],
+          Thursday: [
+            { time: "8:00", subject: "History", teacher: "Mrs. Adams" },
+            { time: "9:00", subject: "Math", teacher: "Dr. Parker" },
+            { time: "10:00", subject: "Break", teacher: "" },
+            { time: "10:30", subject: "English", teacher: "Ms. Chen" },
+            { time: "11:30", subject: "Science", teacher: "Mr. Mitchell" },
+          ],
+          Friday: [
+            { time: "8:00", subject: "Math", teacher: "Dr. Parker" },
+            { time: "9:00", subject: "Geography", teacher: "Mr. Lee" },
+            { time: "10:00", subject: "Break", teacher: "" },
+            { time: "10:30", subject: "Physics", teacher: "Mr. Mitchell" },
+            { time: "11:30", subject: "Sports", teacher: "Coach Williams" },
+          ],
+        },
+      };
+
+      // ========================= CONFIG =========================
+      const defaultConfig = {
+        school_name: "Springfield Academy",
+        platform_name: "Tipic",
+        background_color: "#f8fafc",
+        surface_color: "#ffffff",
+        text_color: "#0f172a",
+        primary_action_color: "#4f46e5",
+        secondary_action_color: "#64748b",
+        font_family: "DM Sans",
+        font_size: 14,
+      };
+
+      function applyConfig(config) {
+        document.body.style.backgroundColor =
+          config.background_color || defaultConfig.background_color;
+        document.body.style.fontFamily = `${config.font_family || defaultConfig.font_family}, sans-serif`;
+        document.body.style.color =
+          config.text_color || defaultConfig.text_color;
+
+        const base = config.font_size || defaultConfig.font_size;
+        document.body.style.fontSize = base + "px";
+
+        document.querySelectorAll(".card, .modal").forEach((el) => {
+          el.style.backgroundColor =
+            config.surface_color || defaultConfig.surface_color;
+        });
+
+        const pn = config.platform_name || defaultConfig.platform_name;
+        const el = document.getElementById("platformNameSidebar");
+        if (el) el.textContent = pn;
+
+        const sn = config.school_name || defaultConfig.school_name;
+        state.schools[0].name = sn;
+        const sel = document.getElementById("selectedSchoolName");
+        if (sel && state.school === 0) sel.textContent = sn;
+      }
+
+      // Config is applied directly using defaultConfig (no external SDK needed)
+
+      // ========================= NAV CONFIG =========================
+      const navConfig = {
+        super_admin: [
+          {
+            group: "Overview",
+            items: [
+              { id: "dashboard", icon: "layout-dashboard", label: "Dashboard" },
+            ],
+          },
+          {
+            group: "Business Network",
+            items: [
+              { id: "school_list", icon: "building-2", label: "Schools Overview" },
+            ],
+          },
+          {
+            group: "Business & Finance",
+            items: [
+              { id: "subscription_plans", icon: "credit-card", label: "Subscriptions" },
+              { id: "revenue_tracking", icon: "trending-up", label: "Revenue & Analytics" },
+            ],
+          },
+          {
+            group: "Communication",
+            items: [
+              { id: "contact", icon: "phone", label: "Contact Us" },
+            ],
+          },
+        ],
+        school_admin: [
+          {
+            group: "Overview",
+            items: [
+              { id: "dashboard", icon: "layout-dashboard", label: "Dashboard" },
+            ],
+          },
+          {
+            group: "School",
+            items: [
+              { id: "school_profile", icon: "building", label: "Profile" },
+              { id: "classes", icon: "layers", label: "Classes" },
+              { id: "departments", icon: "briefcase", label: "Departments" },
+            ],
+          },
+          {
+            group: "People",
+            items: [
+              { id: "student_list", icon: "users", label: "Students" },
+              { id: "staff_list", icon: "user-check", label: "Staff" },
+              { id: "parent_list", icon: "users-2", label: "Parents" },
+            ],
+          },
+          {
+            group: "Academic",
+            items: [
+              { id: "attendance", icon: "clipboard-check", label: "Attendance" },
+              { id: "homework_list", icon: "book-open", label: "Homework" },
+              { id: "results", icon: "award", label: "Results" },
+              { id: "timetable", icon: "calendar-days", label: "Timetable" },
+            ],
+          },
+          {
+            group: "Finance",
+            items: [
+              { id: "fee_structure", icon: "credit-card", label: "Fees" },
+              { id: "fee_collection", icon: "banknote", label: "Collection" },
+            ],
+          },
+          {
+            group: "CMS & Media",
+            items: [
+              { id: "events", icon: "calendar", label: "Events" },
+              { id: "gallery", icon: "image", label: "Gallery" },
+              { id: "pages", icon: "file", label: "Pages" },
+            ],
+          },
+          {
+            group: "Forms",
+            items: [
+              { id: "form_builder", icon: "list-checks", label: "Form Builder" },
+              { id: "form_list", icon: "clipboard-list", label: "Forms" },
+            ],
+          },
+          {
+            group: "Communication",
+            items: [
+              { id: "notices", icon: "megaphone", label: "Notices" },
+              { id: "contact", icon: "phone", label: "Contact Us" },
+            ],
+          },
+        ],
+        staff: [
+          {
+            group: "Overview",
+            items: [
+              { id: "dashboard", icon: "layout-dashboard", label: "Dashboard" },
+            ],
+          },
+          {
+            group: "Teaching",
+            items: [
+              { id: "attendance", icon: "clipboard-check", label: "Mark Attendance" },
+              { id: "homework_list", icon: "book-open", label: "Homework" },
+              { id: "student_list", icon: "users", label: "Students" },
+              { id: "results", icon: "award", label: "Results" },
+              { id: "timetable", icon: "calendar-days", label: "Timetable" },
+            ],
+          },
+          {
+            group: "CMS & Media",
+            items: [
+              { id: "events", icon: "calendar", label: "Events" },
+              { id: "gallery", icon: "image", label: "Gallery" },
+              { id: "form_list", icon: "clipboard-list", label: "Forms" },
+            ],
+          },
+          {
+            group: "Communication",
+            items: [
+              { id: "notices", icon: "megaphone", label: "Notices" },
+              { id: "contact", icon: "phone", label: "Contact Us" },
+            ],
+          },
+        ],
+        parent: [
+          {
+            group: "Overview",
+            items: [
+              { id: "dashboard", icon: "layout-dashboard", label: "Dashboard" },
+            ],
+          },
+          {
+            group: "Child",
+            items: [
+              { id: "child_details", icon: "user", label: "Child Details" },
+              { id: "attendance", icon: "clipboard-check", label: "Attendance" },
+              { id: "homework_list", icon: "book-open", label: "Homework" },
+              { id: "results", icon: "award", label: "Results" },
+              { id: "timetable", icon: "calendar-days", label: "Timetable" },
+            ],
+          },
+          {
+            group: "Finance",
+            items: [
+              { id: "fee_payment", icon: "credit-card", label: "Fee Payment" },
+            ],
+          },
+          {
+            group: "CMS & Media",
+            items: [
+              { id: "events", icon: "calendar", label: "Events" },
+              { id: "gallery", icon: "image", label: "Gallery" },
+              { id: "form_list", icon: "clipboard-list", label: "Forms" },
+            ],
+          },
+          {
+            group: "Communication",
+            items: [
+              { id: "notices", icon: "megaphone", label: "Notices" },
+              { id: "contact", icon: "phone", label: "Contact Us" },
+            ],
+          },
+        ],
+        student: [
+          {
+            group: "Overview",
+            items: [
+              { id: "dashboard", icon: "layout-dashboard", label: "Dashboard" },
+            ],
+          },
+          {
+            group: "Academic",
+            items: [
+              { id: "attendance", icon: "clipboard-check", label: "Attendance" },
+              { id: "homework_list", icon: "book-open", label: "Homework" },
+              { id: "results", icon: "award", label: "Results" },
+              { id: "timetable", icon: "calendar-days", label: "Timetable" },
+            ],
+          },
+          {
+            group: "CMS & Media",
+            items: [
+              { id: "events", icon: "calendar", label: "Events" },
+              { id: "gallery", icon: "image", label: "Gallery" },
+              { id: "form_list", icon: "clipboard-list", label: "Forms" },
+            ],
+          },
+          {
+            group: "Communication",
+            items: [
+              { id: "notices", icon: "megaphone", label: "Notices" },
+              { id: "contact", icon: "phone", label: "Contact Us" },
+            ],
+          },
+        ],
+      };
+
+      const roleNames = {
+        super_admin: "Super Admin",
+        school_admin: "School Admin",
+        staff: "Staff",
+        parent: "Parent",
+        student: "Student",
+      };
+      const roleAvatars = {
+        super_admin: "SA",
+        school_admin: "AD",
+        staff: "ST",
+        parent: "PA",
+        student: "SU",
+      };
+
+      // ========================= UTILITIES =========================
+      function toast(msg, type = "success") {
+        const c = document.getElementById("toastContainer");
+        const t = document.createElement("div");
+        t.className = `toast ${type === "success" ? "bg-success-500" : type === "error" ? "bg-danger-500" : "bg-brand-500"}`;
+        t.textContent = msg;
+        c.appendChild(t);
+        setTimeout(() => t.remove(), 3000);
+      }
+
+      function toggleDropdown(id) {
+        document.querySelectorAll(".dropdown-menu").forEach((m) => {
+          if (m.id !== id) m.classList.remove("show");
+        });
+        document.getElementById(id).classList.toggle("show");
+      }
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".dropdown"))
+          document
+            .querySelectorAll(".dropdown-menu")
+            .forEach((m) => m.classList.remove("show"));
+      });
+
+      function toggleSidebar() {
+        const s = document.getElementById("sidebar");
+        const o = document.getElementById("sidebarOverlay");
+        s.classList.toggle("open");
+        o.classList.toggle("hidden");
+      }
+
+      function toggleCollapse() {
+        const s = document.getElementById("sidebar");
+        s.classList.toggle("collapsed");
+        state.collapsed = s.classList.contains("collapsed");
+      }
+
+      function openModal(html) {
+        document.getElementById("modalContent").innerHTML = html;
+        document.getElementById("modalOverlay").classList.add("show");
+        lucide.createIcons();
+      }
+      function closeModal() {
+        document.getElementById("modalOverlay").classList.remove("show");
+      }
+
+      function selectSchool(i) {
+        state.school = i;
+        document.getElementById("selectedSchoolName").textContent =
+          state.schools[i].name;
+        showScreen(state.screen);
+        toast(`Switched to ${state.schools[i].name}`);
+      }
+
+      function switchRole(role) {
+        state.role = role;
+        document.getElementById("avatarEl").textContent = roleAvatars[role];
+        document.getElementById("userRoleEl").textContent = roleNames[role];
+        document.getElementById("schoolSelectorWrap").style.display =
+          role === "super_admin" ? "" : "none";
+        buildSidebar();
+        showScreen("dashboard");
+        toast(`Switched to ${roleNames[role]} view`);
+      }
+
+      // ========================= SIDEBAR =========================
+      function buildSidebar() {
+        const nav = document.getElementById("sidebarNav");
+        const groups = navConfig[state.role] || [];
+        nav.innerHTML = groups
+          .map(
+            (g) => `
+    <div class="mb-2">
+      <div class="nav-group-title px-5 py-1 text-[10px] font-bold uppercase tracking-wider text-surface-400">${g.group}</div>
+      ${g.items
+        .map(
+          (it) => `
+        <div class="nav-item ${state.screen === it.id ? "active" : ""}" onclick="showScreen('${it.id}')">
+          <i data-lucide="${it.icon}" class="nav-icon"></i>
+          <span class="nav-text">${it.label}</span>
+        </div>
+      `,
+        )
+        .join("")}
+    </div>
+  `,
+          )
+          .join("");
+        lucide.createIcons();
+      }
+
+      // ========================= SCREEN ROUTER =========================
+      function showScreen(id) {
+        // Handle auth screens
+        if (
+          id === "login" ||
+          id === "forgot_password" ||
+          id === "school_signup"
+        ) {
+          document.getElementById("app").style.display = "none";
+          const auth = document.getElementById("authScreen");
+          auth.style.display = "flex";
+          auth.classList.remove("hidden");
+          auth.innerHTML = renderAuth(id);
+          lucide.createIcons();
+          return;
+        }
+        document.getElementById("app").style.display = "flex";
+        document.getElementById("authScreen").style.display = "none";
+
+        state.screen = id;
+        buildSidebar();
+
+        const page = document.getElementById("pageContent");
+        page.innerHTML = getScreenContent(id);
+        lucide.createIcons();
+
+        // Close mobile sidebar
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("sidebarOverlay").classList.add("hidden");
+      }
+
+      // ========================= AUTH SCREENS =========================
+      function renderAuth(type) {
+        const forms = {
+          login: `
+      <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl animate-in">
+          <div class="text-center mb-6">
+            <div class="w-14 h-14 rounded-xl bg-brand-500 flex items-center justify-center mx-auto mb-3">
+              <i data-lucide="graduation-cap" class="w-8 h-8 text-white"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-surface-900 font-display">Welcome Back</h1>
+            <p class="text-sm text-surface-500 mt-1">Sign in to your account</p>
+          </div>
+          <form onsubmit="event.preventDefault();showScreen('dashboard');toast('Welcome back!');">
+            <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="admin@school.com" value="admin@school.com"></div>
+            <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" placeholder="••••••••" value="password"></div>
+            <div class="flex items-center justify-between mb-4">
+              <label class="flex items-center gap-2 text-sm text-surface-600"><input type="checkbox" class="rounded" checked> Remember me</label>
+              <a class="text-sm text-brand-500 font-semibold cursor-pointer" onclick="showScreen('forgot_password')">Forgot password?</a>
+            </div>
+            <button type="submit" class="btn btn-primary w-full justify-center py-3 text-base">Sign In</button>
+          </form>
+          <p class="text-center text-sm text-surface-500 mt-4">New school? <a class="text-brand-500 font-semibold cursor-pointer" onclick="showScreen('school_signup')">Register here</a></p>
+        </div>
+      </div>`,
+          forgot_password: `
+      <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl animate-in">
+          <div class="text-center mb-6">
+            <div class="w-14 h-14 rounded-xl bg-warning-500 flex items-center justify-center mx-auto mb-3">
+              <i data-lucide="key" class="w-8 h-8 text-white"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-surface-900 font-display">Reset Password</h1>
+            <p class="text-sm text-surface-500 mt-1">Enter your email to receive a reset link</p>
+          </div>
+          <form onsubmit="event.preventDefault();toast('Reset link sent to your email!');showScreen('login');">
+            <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-input" placeholder="your@email.com"></div>
+            <button type="submit" class="btn btn-primary w-full justify-center py-3">Send Reset Link</button>
+          </form>
+          <p class="text-center text-sm text-surface-500 mt-4"><a class="text-brand-500 font-semibold cursor-pointer" onclick="showScreen('login')">← Back to Login</a></p>
+        </div>
+      </div>`,
+          school_signup: `
+      <div class="flex items-center justify-center h-full p-4">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-lg shadow-2xl animate-in" style="max-height:90%;overflow-y:auto">
+          <div class="text-center mb-6">
+            <div class="w-14 h-14 rounded-xl bg-success-500 flex items-center justify-center mx-auto mb-3">
+              <i data-lucide="building-2" class="w-8 h-8 text-white"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-surface-900 font-display">Register Your School</h1>
+            <p class="text-sm text-surface-500 mt-1">Get started with Tipic</p>
+          </div>
+          <form onsubmit="event.preventDefault();toast('School registered successfully!');showScreen('login');">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-group"><label class="form-label">School Name</label><input class="form-input" placeholder="Enter school name"></div>
+              <div class="form-group"><label class="form-label">Board/Affiliation</label><input class="form-input" placeholder="e.g. CBSE, ICSE"></div>
+              <div class="form-group"><label class="form-label">Admin Name</label><input class="form-input" placeholder="Full name"></div>
+              <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="admin@school.com"></div>
+              <div class="form-group"><label class="form-label">Phone</label><input class="form-input" placeholder="+1 555-0100"></div>
+              <div class="form-group"><label class="form-label">City</label><input class="form-input" placeholder="City"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Address</label><textarea class="form-input" rows="2" placeholder="Full address"></textarea></div>
+            <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" placeholder="Create a strong password"></div>
+            <button type="submit" class="btn btn-success w-full justify-center py-3 text-base mt-2">Register School</button>
+          </form>
+          <p class="text-center text-sm text-surface-500 mt-4">Already registered? <a class="text-brand-500 font-semibold cursor-pointer" onclick="showScreen('login')">Sign in</a></p>
+        </div>
+      </div>`,
+        };
+        return forms[type] || forms.login;
+      }
+
+      // ========================= DASHBOARD RENDERERS =========================
+      function statCard(icon, label, value, color, delay) {
+        return `<div class="card stat-card animate-in delay-${delay}">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:${color}20"><i data-lucide="${icon}" class="w-5 h-5" style="color:${color}"></i></div>
+      <span class="text-xs font-semibold text-surface-400">This month</span>
+    </div>
+    <div class="text-2xl font-bold text-surface-900">${value}</div>
+    <div class="text-xs text-surface-500 mt-1">${label}</div>
+  </div>`;
+      }
+
+      function renderSuperAdminDash() {
+        const s = state.schools[state.school];
+        return `
+    <div class="mb-6 animate-in"><h1 class="text-2xl font-bold text-surface-900 font-display">Tipic Consultect Business Dashboard</h1><p class="text-surface-500 text-sm mt-1">Super Admin Platform Overview</p></div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      ${statCard("building-2", "Participating Schools", state.schools.length, "#6366f1", 1)}
+      ${statCard("credit-card", "Active Subscriptions", state.schools.length, "#22c55e", 2)}
+      ${statCard("trending-up", "Monthly Recurring", "$2,100", "#f59e0b", 3)}
+      ${statCard("bar-chart-3", "Platform Users", state.schools.reduce((a, b) => a + b.students + b.staff, 0).toLocaleString(), "#ec4899", 4)}
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+      <div class="card animate-in delay-2">
+        <h3 class="font-bold text-surface-800 mb-4">Schools Overview</h3>
+        <div class="space-y-3">
+          ${state.schools
+            .map(
+              (sc, i) => `
+            <div class="flex items-center justify-between p-3 rounded-lg bg-surface-50 cursor-pointer hover:bg-surface-100" onclick="selectSchool(${i});showScreen('school_list')">
+              <div class="flex items-center gap-3">
+                <span class="text-xl">${sc.logo}</span>
+                <div><div class="font-semibold text-sm text-surface-800">${sc.name}</div><div class="text-[10px] text-brand-600 font-bold tracking-widest uppercase">PRO PLAN</div></div>
+              </div>
+              <span class="badge badge-success">ACTIVE</span>
+            </div>
+          `,
+            )
+            .join("")}
+        </div>
+      </div>
+      <div class="card animate-in delay-3">
+        <h3 class="font-bold text-surface-800 mb-4">Subscription & Payment Activity</h3>
+        <div class="space-y-3">
+          ${[
+            {
+              icon: "credit-card",
+              text: "Springfield Academy - Subscription renewed",
+              time: "2 min ago",
+              color: "#22c55e",
+            },
+            {
+              icon: "arrow-up-circle",
+              text: "Riverside High upgraded to Premium Plan",
+              time: "15 min ago",
+              color: "#6366f1",
+            },
+            {
+              icon: "building",
+              text: "New school onboarded - Tech Valley High",
+              time: "1 hr ago",
+              color: "#f59e0b",
+            },
+            {
+              icon: "alert-circle",
+              text: "Pending payment: Oakwood International",
+              time: "2 hrs ago",
+              color: "#ef4444",
+            },
+            {
+              icon: "pie-chart",
+              text: "Monthly revenue report generated",
+              time: "3 hrs ago",
+              color: "#3b82f6",
+            },
+          ]
+            .map(
+              (a) => `
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:${a.color}15"><i data-lucide="${a.icon}" class="w-4 h-4" style="color:${a.color}"></i></div>
+              <div class="flex-1"><div class="text-sm font-medium text-surface-700">${a.text}</div><div class="text-xs text-surface-400">${a.time}</div></div>
+            </div>
+          `,
+            )
+            .join("")}
+        </div>
+      </div>
+    </div>
+    <div class="card animate-in delay-4">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-bold text-surface-800">Quick Actions</h3>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        ${[
+          {
+            icon: "building-2",
+            label: "Onboard School",
+            screen: "add_school",
+            color: "#6366f1",
+          },
+          {
+            icon: "credit-card",
+            label: "Subscriptions",
+            screen: "subscription_plans",
+            color: "#22c55e",
+          },
+          {
+            icon: "trending-up",
+            label: "Revenue Tracker",
+            screen: "revenue_tracking",
+            color: "#f59e0b",
+          },
+          {
+            icon: "phone",
+            label: "Contact School",
+            screen: "contact",
+            color: "#ec4899",
+          },
+        ]
+          .map(
+            (q) => `
+          <button class="flex flex-col items-center gap-2 p-4 rounded-xl border border-surface-200 hover:border-brand-300 hover:bg-brand-50 transition-all" onclick="showScreen('${q.screen}')">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:${q.color}15"><i data-lucide="${q.icon}" class="w-5 h-5" style="color:${q.color}"></i></div>
+            <span class="text-xs font-semibold text-surface-700">${q.label}</span>
+          </button>
+        `,
+          )
+          .join("")}
+      </div>
+    </div>`;
+      }
+
+      function renderSchoolAdminDash() {
+        const s = state.schools[state.school];
+        return `
+    <div class="mb-6 animate-in"><h1 class="text-2xl font-bold text-surface-900 font-display">${s.name}</h1><p class="text-surface-500 text-sm mt-1">School Admin Dashboard</p></div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      ${statCard("users", "Students", s.students, "#6366f1", 1)}
+      ${statCard("user-check", "Staff", s.staff, "#22c55e", 2)}
+      ${statCard("clipboard-check", "Attendance", s.attendance, "#f59e0b", 3)}
+      ${statCard("banknote", "Revenue", s.revenue, "#ec4899", 4)}
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div class="card lg:col-span-2 animate-in delay-2">
+        <h3 class="font-bold text-surface-800 mb-3">Upcoming Events</h3>
+        <div class="space-y-2">${state.events
+          .map(
+            (e) => `
+          <div class="flex items-center gap-3 p-3 rounded-lg bg-surface-50">
+            <div class="text-center"><div class="text-lg font-bold text-brand-500">${e.date.split("-")[2]}</div><div class="text-[10px] text-surface-500">FEB</div></div>
+            <div><div class="text-sm font-semibold text-surface-800">${e.title}</div><div class="text-xs text-surface-500">${e.type}</div></div>
+          </div>
+        `,
+          )
+          .join("")}</div>
+      </div>
+      <div class="card animate-in delay-3">
+        <h3 class="font-bold text-surface-800 mb-3">Fee Collection</h3>
+        <div class="space-y-3">
+          <div class="text-center py-2"><div class="text-3xl font-bold text-brand-500">$13,500</div><div class="text-xs text-surface-500 mt-1">Collected this month</div></div>
+          <div class="progress-bar"><div class="progress-fill bg-brand-500" style="width:68%"></div></div>
+          <div class="flex justify-between text-xs text-surface-500"><span>68% collected</span><span>$20,000 target</span></div>
+        </div>
+      </div>
+    </div>`;
+      }
+
+      function renderStaffDash() {
+        return `
+    <div class="mb-6 animate-in"><h1 class="text-2xl font-bold text-surface-900 font-display">Staff Dashboard</h1><p class="text-surface-500 text-sm mt-1">Welcome, Dr. Sarah Parker</p></div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      ${statCard("users", "My Students", "42", "#6366f1", 1)}
+      ${statCard("book-open", "Pending HW", "3", "#f59e0b", 2)}
+      ${statCard("clipboard-check", "Today Att.", "38/42", "#22c55e", 3)}
+      ${statCard("calendar-days", "Classes Today", "5", "#ec4899", 4)}
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="card animate-in delay-2">
+        <h3 class="font-bold text-surface-800 mb-3">Today's Schedule</h3>
+        ${state.timetable["Monday"]
+          .map(
+            (t) => `
+          <div class="flex items-center gap-3 p-2 ${t.subject === "Break" ? "opacity-50" : ""}">
+            <span class="text-xs font-mono text-surface-500 w-12">${t.time}</span>
+            <div class="flex-1 px-3 py-2 rounded-lg ${t.subject === "Break" ? "bg-surface-100" : "bg-brand-50"}">
+              <span class="text-sm font-semibold ${t.subject === "Break" ? "text-surface-500" : "text-brand-700"}">${t.subject}</span>
+            </div>
+          </div>
+        `,
+          )
+          .join("")}
+      </div>
+      <div class="card animate-in delay-3">
+        <h3 class="font-bold text-surface-800 mb-3">Quick Actions</h3>
+        <div class="grid grid-cols-2 gap-3">
+          <button class="p-4 rounded-xl bg-brand-50 text-brand-700 font-semibold text-sm hover:bg-brand-100" onclick="showScreen('attendance')"><i data-lucide="clipboard-check" class="w-5 h-5 mb-2"></i><br>Mark Attendance</button>
+          <button class="p-4 rounded-xl bg-green-50 text-green-700 font-semibold text-sm hover:bg-green-100" onclick="showScreen('assign_homework')"><i data-lucide="book-open" class="w-5 h-5 mb-2"></i><br>Assign Homework</button>
+          <button class="p-4 rounded-xl bg-amber-50 text-amber-700 font-semibold text-sm hover:bg-amber-100" onclick="showScreen('results')"><i data-lucide="award" class="w-5 h-5 mb-2"></i><br>Add Results</button>
+          <button class="p-4 rounded-xl bg-pink-50 text-pink-700 font-semibold text-sm hover:bg-pink-100" onclick="showScreen('contact')"><i data-lucide="phone" class="w-5 h-5 mb-2"></i><br>Contact Us</button>
+        </div>
+      </div>
+    </div>`;
+      }
+
+      function renderParentDash() {
+        return `
+    <div class="mb-6 animate-in"><h1 class="text-2xl font-bold text-surface-900 font-display">Parent Dashboard</h1><p class="text-surface-500 text-sm mt-1">Welcome, Robert Johnson</p></div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      ${statCard("clipboard-check", "Attendance", "94%", "#22c55e", 1)}
+      ${statCard("book-open", "Pending HW", "2", "#f59e0b", 2)}
+      ${statCard("award", "Last Grade", "A+", "#6366f1", 3)}
+      ${statCard("credit-card", "Fee Due", "$2,000", "#ef4444", 4)}
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="card animate-in delay-2">
+        <h3 class="font-bold text-surface-800 mb-3">Child: Alice Johnson — Class 10-A</h3>
+        <div class="space-y-2">
+          <div class="flex justify-between p-3 bg-surface-50 rounded-lg"><span class="text-sm text-surface-600">Roll Number</span><span class="text-sm font-semibold">STU001</span></div>
+          <div class="flex justify-between p-3 bg-surface-50 rounded-lg"><span class="text-sm text-surface-600">Class Teacher</span><span class="text-sm font-semibold">Dr. Sarah Parker</span></div>
+          <div class="flex justify-between p-3 bg-surface-50 rounded-lg"><span class="text-sm text-surface-600">Overall Grade</span><span class="badge badge-success">A+</span></div>
+        </div>
+      </div>
+      <div class="card animate-in delay-3">
+        <h3 class="font-bold text-surface-800 mb-3">Recent Notices</h3>
+        <div class="space-y-2">${state.notices
+          .map(
+            (n) => `
+          <div class="p-3 rounded-lg bg-surface-50">
+            <div class="flex items-center justify-between"><span class="text-sm font-semibold text-surface-800">${n.title}</span><span class="badge badge-${n.priority === "high" ? "danger" : n.priority === "medium" ? "warning" : "info"}">${n.priority}</span></div>
+            <div class="text-xs text-surface-500 mt-1">${n.date}</div>
+          </div>
+        `,
+          )
+          .join("")}</div>
+      </div>
+    </div>`;
+      }
+
+      function renderStudentDash() {
+        return `
+    <div class="mb-6 animate-in"><h1 class="text-2xl font-bold text-surface-900 font-display">Student Dashboard</h1><p class="text-surface-500 text-sm mt-1">Hello, Alice Johnson — Class 10-A</p></div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      ${statCard("clipboard-check", "Attendance", "94%", "#22c55e", 1)}
+      ${statCard("book-open", "Homework Due", "2", "#f59e0b", 2)}
+      ${statCard("award", "Current Grade", "A+", "#6366f1", 3)}
+      ${statCard("calendar-days", "Classes Today", "5", "#ec4899", 4)}
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="card animate-in delay-2">
+        <h3 class="font-bold text-surface-800 mb-3">Today's Classes</h3>
+        ${state.timetable["Monday"]
+          .map(
+            (t) => `
+          <div class="flex items-center gap-3 p-2">
+            <span class="text-xs font-mono text-surface-500 w-12">${t.time}</span>
+            <div class="flex-1 px-3 py-2 rounded-lg ${t.subject === "Break" ? "bg-surface-100" : "bg-brand-50"}">
+              <span class="text-sm font-semibold ${t.subject === "Break" ? "text-surface-500" : "text-brand-700"}">${t.subject}</span>
+              ${t.teacher ? `<span class="text-xs text-surface-500 ml-2">${t.teacher}</span>` : ""}
+            </div>
+          </div>
+        `,
+          )
+          .join("")}
+      </div>
+      <div class="card animate-in delay-3">
+        <h3 class="font-bold text-surface-800 mb-3">Pending Homework</h3>
+        ${state.homework
+          .filter((h) => h.status === "active")
+          .map(
+            (h) => `
+          <div class="p-3 rounded-lg bg-surface-50 mb-2">
+            <div class="flex justify-between"><span class="text-sm font-semibold text-surface-800">${h.title}</span><span class="badge badge-warning">Due ${h.due}</span></div>
+            <div class="text-xs text-surface-500 mt-1">${h.subject} · ${h.class}</div>
+          </div>
+        `,
+          )
+          .join("")}
+      </div>
+    </div>`;
+      }
+
+      // ========================= PAGE HEADER HELPER =========================
+      function pageHeader(title, subtitle, actions = "") {
+        return `<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 animate-in">
+    <div><h1 class="text-xl font-bold text-surface-900 font-display">${title}</h1><p class="text-surface-500 text-sm mt-0.5">${subtitle}</p></div>
+    <div class="flex gap-2">${actions}</div>
+  </div>`;
+      }
+
+      // ========================= SCREEN CONTENT =========================
+      const COLORS = [
+        { name: 'Amber', hex: '#fbbf24', bg: '#fef3c7', text: '#92400e' },
+        { name: 'Rose', hex: '#fb7185', bg: '#ffe4e6', text: '#9f1239' },
+        { name: 'Teal', hex: '#2dd4bf', bg: '#ccfbf1', text: '#115e59' },
+        { name: 'Violet', hex: '#a78bfa', bg: '#ede9fe', text: '#5b21b6' },
+        { name: 'Sky', hex: '#38bdf8', bg: '#e0f2fe', text: '#0c4a6e' },
+        { name: 'Emerald', hex: '#34d399', bg: '#d1fae5', text: '#065f46' }
+      ];
+      const ICONS = ['megaphone','bell','alert-triangle','info', 'calendar', 'book-open', 'star', 'heart'];
+
+      function selectNoticeColor(idx, el) {
+        state.selectedNoticeColor = idx;
+        document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+        el.classList.add('active');
+        const col = COLORS[idx];
+        const previewBar = document.getElementById('notice-preview-bar');
+        if (previewBar) previewBar.style.backgroundColor = col.hex;
+      }
+
+      function selectNoticeIcon(idx, el) {
+        state.selectedNoticeIcon = idx;
+        document.querySelectorAll('.icon-option').forEach(o => o.classList.remove('active'));
+        el.classList.add('active');
+      }
+
+      function toggleNoticeDropdown(id) {
+        document.getElementById(id).classList.toggle('hidden');
+      }
+
+      function updateNoticeDropdownLabel(type) {
+        const typeMap = {
+          'students-class': 'students-class-dropdown',
+          'students-section': 'students-section-dropdown',
+          'parents-type': 'parents-type-dropdown',
+          'parents-classwise': 'parents-classwise-dropdown',
+          'staff-type': 'staff-type-dropdown'
+        };
+        const dropdownId = typeMap[type];
+        const labelEl = document.getElementById(type + '-label');
+        if (!labelEl) return;
+
+        let vals = [];
+        if (type === 'parents-type') {
+          const sel = document.querySelector('input[name="parent-type"]:checked');
+          if (sel) vals = [sel.parentElement.textContent.trim()];
+        } else {
+          vals = [...document.querySelectorAll(`#${dropdownId} input:checked`)].map(cb => cb.value);
+        }
+        labelEl.textContent = vals.length ? vals.join(', ') : 'Select...';
+        labelEl.classList.toggle('text-surface-400', !vals.length);
+      }
+
+      function handleNoticeAudienceChange() {
+        const all = document.getElementById('aud-all').checked;
+        const stu = document.getElementById('aud-students').checked;
+        const par = document.getElementById('aud-parents').checked;
+        const staff = document.getElementById('aud-staff').checked;
+
+        if (all) {
+          ['aud-students','aud-parents','aud-staff'].forEach(id => { 
+            const el = document.getElementById(id);
+            el.checked = true; 
+            el.disabled = true; 
+          });
+        } else {
+          ['aud-students','aud-parents','aud-staff'].forEach(id => { 
+            document.getElementById(id).disabled = false; 
+          });
+        }
+
+        document.getElementById('specific-students-section')?.classList.toggle('hidden', !stu || all);
+        document.getElementById('specific-parents-section')?.classList.toggle('hidden', !par || all);
+        document.getElementById('specific-staff-section')?.classList.toggle('hidden', !staff || all);
+      }
+
+      function handleNoticeParentTypeChange() {
+        const selected = document.querySelector('input[name="parent-type"]:checked')?.value;
+        document.getElementById('parents-classwise-section')?.classList.toggle('hidden', selected !== 'class-wise');
+        document.getElementById('parents-specific-section')?.classList.toggle('hidden', selected !== 'specific');
+        updateNoticeDropdownLabel('parents-type');
+      }
+
+      function deleteNotice(id) {
+        state.notices = state.notices.filter(n => n.id !== id);
+        toast('Notice removed');
+        showScreen('notices');
+      }
+
+      function getScreenContent(id) {
+        const screens = {
+          dashboard: () => {
+            const r = state.role;
+            if (r === "super_admin") return renderSuperAdminDash();
+            if (r === "school_admin") return renderSchoolAdminDash();
+            if (r === "staff") return renderStaffDash();
+            if (r === "parent") return renderParentDash();
+            return renderStudentDash();
+          },
+
+          // ---- SCHOOLS ----
+          school_list: () =>
+            pageHeader(
+              "Schools",
+              "Manage all registered schools",
+              `<button class="btn btn-primary" onclick="showScreen('add_school')"><i data-lucide="plus" class="w-4 h-4"></i>Add School</button>`,
+            ) +
+            `
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in delay-1">${state.schools
+        .map(
+          (s, i) => `
+        <div class="card cursor-pointer hover:border-brand-300" onclick="selectSchool(${i})">
+          <div class="flex items-center gap-3 mb-3"><span class="text-3xl">${s.logo}</span><div><div class="font-bold text-surface-800">${s.name}</div><div class="text-xs text-surface-500">${s.students} students</div></div></div>
+          <div class="grid grid-cols-2 gap-2 text-center">
+            <div class="p-2 bg-surface-50 rounded-lg"><div class="text-lg font-bold text-brand-500">${s.staff}</div><div class="text-[10px] text-surface-500">Staff</div></div>
+            <div class="p-2 bg-surface-50 rounded-lg"><div class="text-lg font-bold text-success-500">${s.attendance}</div><div class="text-[10px] text-surface-500">Attendance</div></div>
+          </div>
+          <div class="flex gap-2 mt-3">
+            <button class="btn btn-outline flex-1 text-xs" onclick="event.stopPropagation();showScreen('school_profile')">View</button>
+            <button class="btn btn-ghost text-xs" onclick="event.stopPropagation();showScreen('add_school')">Edit</button>
+          </div>
+        </div>
+      `,
+        )
+        .join("")}</div>`,
+
+          add_school: () =>
+            pageHeader(
+              "Add School",
+              "Register a new school on the platform",
+              `<button class="btn btn-ghost" onclick="showScreen('school_list')">← Back</button>`,
+            ) +
+            `
+      <div class="card max-w-2xl animate-in delay-1">
+        <form onsubmit="event.preventDefault();toast('School added successfully!');showScreen('school_list')">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-group"><label class="form-label">School Name</label><input class="form-input" placeholder="Enter school name" required></div>
+            <div class="form-group"><label class="form-label">Board</label><select class="form-input"><option>CBSE</option><option>ICSE</option><option>State Board</option><option>IB</option></select></div>
+            <div class="form-group"><label class="form-label">Admin Email</label><input type="email" class="form-input" placeholder="admin@school.com"></div>
+            <div class="form-group"><label class="form-label">Phone</label><input class="form-input" placeholder="+1 555-0100"></div>
+            <div class="form-group md:col-span-2"><label class="form-label">Address</label><textarea class="form-input" rows="2" placeholder="Full address"></textarea></div>
+            <div class="form-group"><label class="form-label">City</label><input class="form-input" placeholder="City"></div>
+            <div class="form-group"><label class="form-label">Max Students</label><input type="number" class="form-input" placeholder="500"></div>
+          </div>
+          <div class="flex gap-2 mt-4"><button type="submit" class="btn btn-primary">Save School</button><button type="button" class="btn btn-ghost" onclick="showScreen('school_list')">Cancel</button></div>
+        </form>
+      </div>`,
+
+          school_profile: () => {
+            const s = state.schools[state.school];
+            return (
+              pageHeader(s.name, "School Profile & Settings") +
+              `
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 animate-in delay-1">
+        <div class="card lg:col-span-2">
+          <h3 class="font-bold text-surface-800 mb-4">School Information</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div><div class="text-xs text-surface-500">School Name</div><div class="font-semibold text-surface-800">${s.name}</div></div>
+            <div><div class="text-xs text-surface-500">Students</div><div class="font-semibold">${s.students}</div></div>
+            <div><div class="text-xs text-surface-500">Staff</div><div class="font-semibold">${s.staff}</div></div>
+            <div><div class="text-xs text-surface-500">Attendance Rate</div><div class="font-semibold">${s.attendance}</div></div>
+            <div><div class="text-xs text-surface-500">Revenue</div><div class="font-semibold text-success-600">${s.revenue}</div></div>
+            <div><div class="text-xs text-surface-500">Board</div><div class="font-semibold">CBSE</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 class="font-bold text-surface-800 mb-4">Quick Stats</h3>
+          <div class="space-y-3">
+            <div><div class="flex justify-between text-xs mb-1"><span class="text-surface-500">Capacity</span><span class="font-semibold">78%</span></div><div class="progress-bar"><div class="progress-fill bg-brand-500" style="width:78%"></div></div></div>
+            <div><div class="flex justify-between text-xs mb-1"><span class="text-surface-500">Fee Collection</span><span class="font-semibold">68%</span></div><div class="progress-bar"><div class="progress-fill bg-success-500" style="width:68%"></div></div></div>
+            <div><div class="flex justify-between text-xs mb-1"><span class="text-surface-500">Attendance</span><span class="font-semibold">${s.attendance}</span></div><div class="progress-bar"><div class="progress-fill bg-warning-500" style="width:${parseInt(s.attendance)}%"></div></div></div>
+          </div>
+        </div>
+      </div>`
+            );
+          },
+
+          // ---- STUDENTS ----
+          student_list: () =>
+            pageHeader(
+              "Students",
+              "Manage student records",
+              `<button class="btn btn-primary" onclick="showScreen('add_student')"><i data-lucide="plus" class="w-4 h-4"></i>Add Student</button>`,
+            ) +
+            `
+      <div class="card animate-in delay-1">
+        <div class="flex flex-col sm:flex-row gap-3 mb-4">
+          <div class="flex-1 flex items-center bg-surface-50 rounded-lg px-3 border border-surface-200"><i data-lucide="search" class="w-4 h-4 text-surface-400 mr-2"></i><input type="text" placeholder="Search students..." class="bg-transparent border-none outline-none text-sm w-full py-2"></div>
+          <select class="form-input w-auto"><option>All Classes</option>${state.classes.map((c) => `<option>${c}</option>`).join("")}</select>
+        </div>
+        <div class="table-container">
+          <table><thead><tr><th>Student</th><th>ID</th><th>Class</th><th>Parent</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>${state.students
+            .map(
+              (s) => `
+            <tr>
+              <td><div class="flex items-center gap-2"><div class="avatar" style="background:${s.avatar};width:32px;height:32px;font-size:12px">${s.name
+                .split(" ")
+                .map((n) => n[0])
+                .join(
+                  "",
+                )}</div><span class="font-medium">${s.name}</span></div></td>
+              <td class="font-mono text-xs">${s.id}</td><td>${s.class}</td><td>${s.parent}</td>
+              <td><span class="badge ${s.status === "active" ? "badge-success" : "badge-danger"}">${s.status}</span></td>
+              <td><div class="flex gap-1"><button class="btn btn-ghost text-xs p-1" onclick="showScreen('student_details')"><i data-lucide="eye" class="w-4 h-4"></i></button><button class="btn btn-ghost text-xs p-1"><i data-lucide="edit" class="w-4 h-4"></i></button><button class="btn btn-ghost text-xs p-1 text-danger-500" onclick="toast('Student removed','error')"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></td>
+            </tr>
+          `,
+            )
+            .join("")}</tbody></table>
+        </div>
+      </div>`,
+
+          add_student: () =>
+            pageHeader(
+              "Add Student",
+              "Register a new student",
+              `<button class="btn btn-ghost" onclick="showScreen('student_list')">← Back</button>`,
+            ) +
+            `
+      <div class="card max-w-2xl animate-in delay-1">
+        <form onsubmit="event.preventDefault();toast('Student added successfully!');showScreen('student_list')">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" placeholder="Student full name" required></div>
+            <div class="form-group"><label class="form-label">Class</label><select class="form-input">${state.classes.map((c) => `<option>${c}</option>`).join("")}</select></div>
+            <div class="form-group"><label class="form-label">Gender</label><select class="form-input"><option>Male</option><option>Female</option><option>Other</option></select></div>
+            <div class="form-group"><label class="form-label">Date of Birth</label><input type="date" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Parent Name</label><input class="form-input" placeholder="Parent/Guardian name"></div>
+            <div class="form-group"><label class="form-label">Parent Phone</label><input class="form-input" placeholder="+1 555-0100"></div>
+            <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="student@email.com"></div>
+            <div class="form-group"><label class="form-label">Blood Group</label><select class="form-input"><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>O+</option><option>O-</option><option>AB+</option><option>AB-</option></select></div>
+            <div class="form-group md:col-span-2"><label class="form-label">Address</label><textarea class="form-input" rows="2" placeholder="Full address"></textarea></div>
+          </div>
+          <div class="flex gap-2 mt-4"><button type="submit" class="btn btn-primary">Save Student</button><button type="button" class="btn btn-ghost" onclick="showScreen('student_list')">Cancel</button></div>
+        </form>
+      </div>`,
+
+          student_details: () => {
+            const s = state.students[0];
+            return (
+              pageHeader(
+                s.name,
+                `Student ID: ${s.id}`,
+                `<button class="btn btn-ghost" onclick="showScreen('student_list')">← Back</button><button class="btn btn-outline">Edit</button>`,
+              ) +
+              `
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 animate-in delay-1">
+        <div class="card text-center">
+          <div class="avatar mx-auto mb-3" style="background:${s.avatar};width:64px;height:64px;font-size:24px">${s.name
+            .split(" ")
+            .map((n) => n[0])
+            .join("")}</div>
+          <h3 class="font-bold text-surface-800">${s.name}</h3>
+          <p class="text-sm text-surface-500">Class ${s.class}</p>
+          <span class="badge badge-success mt-2">${s.status}</span>
+        </div>
+        <div class="card lg:col-span-2">
+          <h3 class="font-bold text-surface-800 mb-3">Details</h3>
+          <div class="grid grid-cols-2 gap-3">
+            ${[
+              ["ID", s.id],
+              ["Class", s.class],
+              ["Gender", s.gender === "M" ? "Male" : "Female"],
+              ["Parent", s.parent],
+              ["Phone", s.phone],
+              ["Email", s.email],
+            ]
+              .map(
+                ([l, v]) => `
+              <div class="p-3 bg-surface-50 rounded-lg"><div class="text-xs text-surface-500">${l}</div><div class="text-sm font-semibold text-surface-800">${v}</div></div>
+            `,
+              )
+              .join("")}
+          </div>
+        </div>
+      </div>`
+            );
+          },
+
+          child_details: () => getScreenContent("student_details"),
+
+          // ---- STAFF ----
+          staff_list: () =>
+            pageHeader(
+              "Staff",
+              "Manage staff members",
+              `<button class="btn btn-primary" onclick="showScreen('add_staff')"><i data-lucide="plus" class="w-4 h-4"></i>Add Staff</button>`,
+            ) +
+            `
+      <div class="card animate-in delay-1">
+        <div class="table-container">
+          <table><thead><tr><th>Staff</th><th>ID</th><th>Department</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>${state.staff
+            .map(
+              (s) => `
+            <tr>
+              <td><div class="flex items-center gap-2"><div class="avatar" style="background:${s.avatar};width:32px;height:32px;font-size:12px">${s.name
+                .split(" ")
+                .map((n) => n[0])
+                .join(
+                  "",
+                )}</div><span class="font-medium">${s.name}</span></div></td>
+              <td class="font-mono text-xs">${s.id}</td><td>${s.dept}</td><td>${s.role}</td>
+              <td><span class="badge badge-success">${s.status}</span></td>
+              <td><div class="flex gap-1"><button class="btn btn-ghost text-xs p-1"><i data-lucide="eye" class="w-4 h-4"></i></button><button class="btn btn-ghost text-xs p-1"><i data-lucide="edit" class="w-4 h-4"></i></button></div></td>
+            </tr>
+          `,
+            )
+            .join("")}</tbody></table>
+        </div>
+      </div>`,
+
+          add_staff: () =>
+            pageHeader(
+              "Add Staff",
+              "Register a new staff member",
+              `<button class="btn btn-ghost" onclick="showScreen('staff_list')">← Back</button>`,
+            ) +
+            `
+      <div class="card max-w-2xl animate-in delay-1">
+        <form onsubmit="event.preventDefault();toast('Staff added successfully!');showScreen('staff_list')">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" required placeholder="Full name"></div>
+            <div class="form-group"><label class="form-label">Department</label><select class="form-input"><option>Mathematics</option><option>Science</option><option>English</option><option>Admin</option></select></div>
+            <div class="form-group"><label class="form-label">Role</label><select class="form-input"><option>Teacher</option><option>Non-Teaching</option></select></div>
+            <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="staff@school.com"></div>
+            <div class="form-group"><label class="form-label">Phone</label><input class="form-input" placeholder="+1 555-0200"></div>
+            <div class="form-group"><label class="form-label">Joining Date</label><input type="date" class="form-input"></div>
+          </div>
+          <div class="flex gap-2 mt-4"><button type="submit" class="btn btn-primary">Save</button><button type="button" class="btn btn-ghost" onclick="showScreen('staff_list')">Cancel</button></div>
+        </form>
+      </div>`,
+
+          parent_list: () =>
+            pageHeader("Parents", "View parent/guardian records") +
+            `
+      <div class="card animate-in delay-1">
+        <div class="table-container">
+          <table><thead><tr><th>Parent</th><th>Child</th><th>Phone</th><th>Actions</th></tr></thead>
+          <tbody>${state.students
+            .map(
+              (s) => `
+            <tr><td class="font-medium">${s.parent}</td><td>${s.name} (${s.class})</td><td>${s.phone}</td>
+            <td><button class="btn btn-ghost text-xs" onclick="showScreen('contact')"><i data-lucide="phone" class="w-4 h-4"></i></button></td></tr>
+          `,
+            )
+            .join("")}</tbody></table>
+        </div>
+      </div>`,
+
+          // ---- CLASSES & DEPTS ----
+          classes: () =>
+            pageHeader(
+              "Classes & Sections",
+              "Manage class structure",
+              `<button class="btn btn-primary" onclick="openModal('<h3 class=\\'font-bold text-lg mb-4\\'>Add Class</h3><form onsubmit=\\'event.preventDefault();closeModal();toast(&quot;Class added!&quot;)\\'><div class=\\'form-group\\'><label class=\\'form-label\\'>Class Name</label><input class=\\'form-input\\' placeholder=\\'e.g. 10-C\\'></div><div class=\\'form-group\\'><label class=\\'form-label\\'>Class Teacher</label><select class=\\'form-input\\'>${state.staff
+                .filter((s) => s.role === "Teacher")
+                .map((s) => `<option>${s.name}</option>`)
+                .join(
+                  "",
+                )}</select></div><button type=\\'submit\\' class=\\'btn btn-primary\\'>Save</button></form>')"><i data-lucide="plus" class="w-4 h-4"></i>Add Class</button>`,
+            ) +
+            `
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 animate-in delay-1">${state.classes
+        .map(
+          (c) => `
+        <div class="card text-center hover:border-brand-300 cursor-pointer">
+          <div class="text-2xl font-bold text-brand-500 mb-1">${c}</div>
+          <div class="text-xs text-surface-500">${Math.floor(Math.random() * 20 + 25)} students</div>
+        </div>
+      `,
+        )
+        .join("")}</div>`,
+
+          departments: () =>
+            pageHeader("Departments", "Manage school departments") +
+            `
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in delay-1">
+        ${["Mathematics", "Science", "English", "History", "Admin", "Sports"]
+          .map(
+            (d, i) => `
+          <div class="card"><div class="flex items-center gap-3 mb-2"><div class="w-10 h-10 rounded-xl bg-brand-${i % 2 ? "100" : "50"} flex items-center justify-center"><i data-lucide="briefcase" class="w-5 h-5 text-brand-500"></i></div><div><div class="font-bold text-surface-800">${d}</div><div class="text-xs text-surface-500">${Math.floor(Math.random() * 10 + 5)} staff</div></div></div></div>
+        `,
+          )
+          .join("")}
+      </div>`,
+
+          // ---- ATTENDANCE ----
+          attendance: () => {
+            const isStaff =
+              state.role === "staff" ||
+              state.role === "school_admin" ||
+              state.role === "super_admin";
+            if (!isStaff) {
+              // Student/Parent view
+              return (
+                pageHeader("My Attendance", "View attendance records") +
+                `
+          <div class="card mb-4 bg-brand-50 border-brand-100 animate-in delay-1">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div>
+                <h4 class="font-bold text-brand-900">Digital Check-in</h4>
+                <p class="text-xs text-brand-600 font-medium">Scan QR code at school to mark your attendance</p>
+              </div>
+              <button class="btn btn-primary" onclick="markAttendanceViaQR()"><i data-lucide="qr-code" class="w-4 h-4"></i> Scan QR code</button>
+            </div>
+          </div>
+          <div class="card animate-in delay-2">
+            <div class="grid grid-cols-3 gap-4 mb-4 text-center">
+              <div class="p-4 bg-green-50 rounded-xl"><div class="text-2xl font-bold text-green-600">176</div><div class="text-xs text-surface-500">Present</div></div>
+              <div class="p-4 bg-red-50 rounded-xl"><div class="text-2xl font-bold text-red-500">11</div><div class="text-xs text-surface-500">Absent</div></div>
+              <div class="p-4 bg-blue-50 rounded-xl"><div class="text-2xl font-bold text-blue-600">94%</div><div class="text-xs text-surface-500">Rate</div></div>
+            </div>
+            <h3 class="font-bold text-surface-800 mb-3">Recent Days</h3>
+            <div class="space-y-2">${[
+              "2025-02-10",
+              "2025-02-09",
+              "2025-02-08",
+              "2025-02-07",
+              "2025-02-06",
+            ]
+              .map(
+                (d, i) => `
+              <div class="flex items-center justify-between p-3 bg-surface-50 rounded-lg">
+                <span class="text-sm text-surface-700">${d}</span>
+                <span class="badge ${i === 2 ? "badge-danger" : "badge-success"}">${i === 2 ? "Absent" : "Present"}</span>
+              </div>
+            `,
+              )
+              .join("")}</div>
+          </div>`
+              );
+            }
+            return (
+              pageHeader("Mark Attendance", "Record daily attendance") +
+              `
+        <div class="card animate-in delay-1">
+          <div class="flex flex-col sm:flex-row gap-3 mb-4">
+            <select class="form-input w-auto"><option>Select Class</option>${state.classes.map((c) => `<option>${c}</option>`).join("")}</select>
+            <input type="date" class="form-input w-auto" value="2025-02-10">
+            <button class="btn btn-outline" onclick="toast('Attendance loaded')">Load</button>
+            <button class="btn btn-success ml-auto" onclick="generateQR()"><i data-lucide="qr-code" class="w-4 h-4"></i> Generate Today's QR</button>
+          </div>
+          <div class="table-container">
+            <table><thead><tr><th>Student</th><th>Present</th><th>Absent</th><th>Late</th></tr></thead>
+            <tbody>${state.students
+              .map(
+                (s) => `
+              <tr><td class="font-medium">${s.name}</td>
+              <td><label class="flex items-center gap-1"><input type="radio" name="att_${s.id}" checked> <span class="text-xs">P</span></label></td>
+              <td><label class="flex items-center gap-1"><input type="radio" name="att_${s.id}"> <span class="text-xs">A</span></label></td>
+              <td><label class="flex items-center gap-1"><input type="radio" name="att_${s.id}"> <span class="text-xs">L</span></label></td></tr>
+            `,
+              )
+              .join("")}</tbody></table>
+          </div>
+          <div class="mt-4"><button class="btn btn-primary" onclick="toast('Attendance saved!')">Save Attendance</button></div>
+        </div>`
+            );
+          },
+
+          // ---- HOMEWORK ----
+          homework_list: () =>
+            pageHeader(
+              "Homework",
+              "View and manage assignments",
+              state.role !== "student" && state.role !== "parent"
+                ? `<button class="btn btn-primary" onclick="showScreen('assign_homework')"><i data-lucide="plus" class="w-4 h-4"></i>Assign</button>`
+                : "",
+            ) +
+            `
+      <div class="card animate-in delay-1">
+        <div class="space-y-3">${state.homework
+          .map(
+            (h) => `
+          <div class="flex items-center justify-between p-4 rounded-xl border border-surface-200 hover:border-brand-200">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center"><i data-lucide="book-open" class="w-5 h-5 text-brand-500"></i></div>
+              <div><div class="font-semibold text-surface-800">${h.title}</div><div class="text-xs text-surface-500">${h.subject} · ${h.class} · Due: ${h.due}</div></div>
+            </div>
+            <span class="badge ${h.status === "active" ? "badge-warning" : "badge-success"}">${h.status}</span>
+          </div>
+        `,
+          )
+          .join("")}</div>
+      </div>`,
+
+          assign_homework: () =>
+            pageHeader(
+              "Assign Homework",
+              "Create a new assignment",
+              `<button class="btn btn-ghost" onclick="showScreen('homework_list')">← Back</button>`,
+            ) +
+            `
+      <div class="card max-w-2xl animate-in delay-1">
+        <form onsubmit="event.preventDefault();toast('Homework assigned!');showScreen('homework_list')">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-group"><label class="form-label">Subject</label><select class="form-input">${state.subjects.map((s) => `<option>${s}</option>`).join("")}</select></div>
+            <div class="form-group"><label class="form-label">Class</label><select class="form-input">${state.classes.map((c) => `<option>${c}</option>`).join("")}</select></div>
+            <div class="form-group md:col-span-2"><label class="form-label">Title</label><input class="form-input" placeholder="Homework title" required></div>
+            <div class="form-group md:col-span-2"><label class="form-label">Description</label><textarea class="form-input" rows="3" placeholder="Instructions..."></textarea></div>
+            <div class="form-group"><label class="form-label">Due Date</label><input type="date" class="form-input"></div>
+          </div>
+          <div class="flex gap-2 mt-4"><button type="submit" class="btn btn-primary">Assign</button><button type="button" class="btn btn-ghost" onclick="showScreen('homework_list')">Cancel</button></div>
+        </form>
+      </div>`,
+
+          // ---- RESULTS ----
+          results: () => {
+            if (state.role === "student" || state.role === "parent") {
+              return (
+                pageHeader("Results", "View academic performance") +
+                `
+          <div class="card animate-in delay-1">
+            <div class="text-center mb-4"><div class="text-4xl font-bold text-brand-500">A+</div><div class="text-sm text-surface-500">Overall Grade</div></div>
+            <div class="table-container">
+              <table><thead><tr><th>Subject</th><th>Marks</th><th>Grade</th></tr></thead>
+              <tbody>${state.subjects
+                .slice(0, 6)
+                .map((s) => {
+                  const m = Math.floor(Math.random() * 20 + 75);
+                  return `<tr><td>${s}</td><td>${m}/100</td><td><span class="badge ${m >= 80 ? "badge-success" : m >= 60 ? "badge-warning" : "badge-danger"}">${m >= 90 ? "A+" : m >= 80 ? "A" : m >= 70 ? "B" : "C"}</span></td></tr>`;
+                })
+                .join("")}</tbody></table>
+            </div>
+          </div>`
+              );
+            }
+            return (
+              pageHeader(
+                "Results",
+                "Manage student results",
+                `<button class="btn btn-primary" onclick="showScreen('add_results')"><i data-lucide="plus" class="w-4 h-4"></i>Add Results</button>`,
+              ) +
+              `
+        <div class="card animate-in delay-1">
+          <div class="flex gap-3 mb-4">
+            <select class="form-input w-auto"><option>Select Class</option>${state.classes.map((c) => `<option>${c}</option>`).join("")}</select>
+            <select class="form-input w-auto"><option>Select Exam</option><option>Mid Term</option><option>Final</option></select>
+          </div>
+          <div class="table-container">
+            <table><thead><tr><th>Student</th><th>Math</th><th>Science</th><th>English</th><th>Total</th><th>Grade</th></tr></thead>
+            <tbody>${state.students
+              .slice(0, 3)
+              .map((s) => {
+                const marks = [85, 78, 92];
+                const t = marks.reduce((a, b) => a + b, 0);
+                return `<tr><td class="font-medium">${s.name}</td>${marks.map((m) => `<td>${m}</td>`).join("")}<td class="font-bold">${t}/300</td><td><span class="badge badge-success">A</span></td></tr>`;
+              })
+              .join("")}</tbody></table>
+          </div>
+        </div>`
+            );
+          },
+
+          add_results: () =>
+            pageHeader(
+              "Add Results",
+              "Enter exam results",
+              `<button class="btn btn-ghost" onclick="showScreen('results')">← Back</button>`,
+            ) +
+            `
+      <div class="card max-w-2xl animate-in delay-1">
+        <form onsubmit="event.preventDefault();toast('Results saved!');showScreen('results')">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div class="form-group"><label class="form-label">Class</label><select class="form-input">${state.classes.map((c) => `<option>${c}</option>`).join("")}</select></div>
+            <div class="form-group"><label class="form-label">Exam</label><select class="form-input"><option>Mid Term</option><option>Final</option></select></div>
+            <div class="form-group"><label class="form-label">Subject</label><select class="form-input">${state.subjects.map((s) => `<option>${s}</option>`).join("")}</select></div>
+          </div>
+          <div class="table-container mb-4">
+            <table><thead><tr><th>Student</th><th>Marks (out of 100)</th></tr></thead>
+            <tbody>${state.students.map((s) => `<tr><td class="font-medium">${s.name}</td><td><input type="number" class="form-input w-24" max="100" min="0" placeholder="0"></td></tr>`).join("")}</tbody></table>
+          </div>
+          <button type="submit" class="btn btn-primary">Save Results</button>
+        </form>
+      </div>`,
+
+          // ---- TIMETABLE ----
+          timetable: () =>
+            pageHeader("Timetable", "Weekly class schedule") +
+            `
+      <div class="card animate-in delay-1 overflow-x-auto">
+        <div class="table-container">
+          <table><thead><tr><th>Time</th>${Object.keys(state.timetable)
+            .map((d) => `<th>${d}</th>`)
+            .join("")}</tr></thead>
+          <tbody>${state.timetable["Monday"]
+            .map(
+              (_, i) => `
+            <tr>${["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+              .map((d, di) => {
+                const slot = state.timetable[d][i];
+                if (di === 0)
+                  return `<td class="font-mono text-xs text-surface-500">${slot.time}</td><td><div class="px-2 py-1 rounded ${slot.subject === "Break" ? "bg-surface-100 text-surface-500" : "bg-brand-50 text-brand-700"} text-xs font-semibold">${slot.subject}</div></td>`;
+                return `<td><div class="px-2 py-1 rounded ${slot.subject === "Break" ? "bg-surface-100 text-surface-500" : "bg-brand-50 text-brand-700"} text-xs font-semibold">${slot.subject}</div></td>`;
+              })
+              .join("")}</tr>
+          `,
+            )
+            .join("")}</tbody></table>
+        </div>
+      </div>`,
+
+          syllabus: () =>
+            pageHeader("Syllabus", "Manage course syllabus") +
+            `
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in delay-1">${state.subjects
+        .map(
+          (s) => `
+        <div class="card">
+          <div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center"><i data-lucide="book" class="w-5 h-5 text-brand-500"></i></div><div><div class="font-bold text-surface-800">${s}</div><div class="text-xs text-surface-500">12 chapters</div></div></div>
+          <div class="progress-bar"><div class="progress-fill bg-brand-500" style="width:${Math.floor(Math.random() * 40 + 40)}%"></div></div>
+          <div class="text-xs text-surface-500 mt-1">${Math.floor(Math.random() * 40 + 40)}% completed</div>
+        </div>
+      `,
+        )
+        .join("")}</div>`,
+
+          // ---- FEES ----
+          fee_structure: () =>
+            pageHeader("Fee Structure", "Manage fee categories") +
+            `
+      <div class="card animate-in delay-1">
+        <div class="table-container">
+          <table><thead><tr><th>Category</th><th>Class</th><th>Amount</th><th>Frequency</th></tr></thead>
+          <tbody>
+            ${[
+              ["Tuition Fee", "All", "$3,000", "Monthly"],
+              ["Lab Fee", "9-12", "$500", "Quarterly"],
+              ["Sports Fee", "All", "$200", "Yearly"],
+              ["Library Fee", "All", "$100", "Yearly"],
+              ["Transport Fee", "Opted", "$150", "Monthly"],
+            ]
+              .map(
+                ([c, cl, a, f]) => `
+              <tr><td class="font-medium">${c}</td><td>${cl}</td><td class="font-semibold text-brand-600">${a}</td><td>${f}</td></tr>
+            `,
+              )
+              .join("")}
+          </tbody></table>
+        </div>
+      </div>`,
+
+          fee_collection: () =>
+            pageHeader("Fee Collection", "Track and collect fees") +
+            `
+      <div class="card animate-in delay-1">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+          <div class="p-3 bg-green-50 rounded-xl text-center"><div class="text-lg font-bold text-green-600">$10,500</div><div class="text-xs text-surface-500">Collected</div></div>
+          <div class="p-3 bg-red-50 rounded-xl text-center"><div class="text-lg font-bold text-red-500">$4,500</div><div class="text-xs text-surface-500">Pending</div></div>
+          <div class="p-3 bg-yellow-50 rounded-xl text-center"><div class="text-lg font-bold text-yellow-600">$3,000</div><div class="text-xs text-surface-500">Partial</div></div>
+          <div class="p-3 bg-blue-50 rounded-xl text-center"><div class="text-lg font-bold text-blue-600">70%</div><div class="text-xs text-surface-500">Rate</div></div>
+        </div>
+        <div class="table-container">
+          <table><thead><tr><th>Student</th><th>Class</th><th>Amount</th><th>Paid</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>${state.fees
+            .map(
+              (f) => `
+            <tr><td class="font-medium">${f.student}</td><td>${f.class}</td><td>$${f.amount.toLocaleString()}</td><td>$${f.paid.toLocaleString()}</td>
+            <td><span class="badge ${f.status === "paid" ? "badge-success" : f.status === "partial" ? "badge-warning" : "badge-danger"}">${f.status}</span></td>
+            <td><button class="btn btn-outline text-xs" onclick="toast('Payment recorded')">Record Payment</button></td></tr>
+          `,
+            )
+            .join("")}</tbody></table>
+        </div>
+      </div>`,
+
+          fee_payment: () =>
+            pageHeader("Fee Payment", "Pay your child's fees") +
+            `
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 animate-in delay-1">
+        <div class="card">
+          <h3 class="font-bold text-surface-800 mb-3">Fee Summary</h3>
+          <div class="space-y-2">
+            <div class="flex justify-between p-3 bg-surface-50 rounded-lg"><span>Tuition Fee</span><span class="font-bold">$3,000</span></div>
+            <div class="flex justify-between p-3 bg-surface-50 rounded-lg"><span>Lab Fee</span><span class="font-bold">$500</span></div>
+            <div class="flex justify-between p-3 bg-surface-50 rounded-lg"><span>Transport</span><span class="font-bold">$150</span></div>
+            <hr class="border-surface-200">
+            <div class="flex justify-between p-3 font-bold text-lg"><span>Total Due</span><span class="text-danger-500">$2,000</span></div>
+          </div>
+          <p class="text-xs text-surface-400 mt-3 italic">⚠️ Demo — payment processing is simulated</p>
+          <button class="btn btn-primary w-full justify-center mt-3" onclick="toast('Payment simulation successful!')">Pay Now (Demo)</button>
+        </div>
+        <div class="card">
+          <h3 class="font-bold text-surface-800 mb-3">Payment History</h3>
+          <div class="space-y-2">
+            ${[
+              ["Jan 15, 2025", "$5,000", "paid"],
+              ["Dec 15, 2024", "$5,000", "paid"],
+              ["Nov 15, 2024", "$3,000", "paid"],
+            ]
+              .map(
+                ([d, a, s]) => `
+              <div class="flex items-center justify-between p-3 bg-surface-50 rounded-lg">
+                <div><div class="text-sm font-semibold">${a}</div><div class="text-xs text-surface-500">${d}</div></div>
+                <span class="badge badge-success">${s}</span>
+              </div>
+            `,
+              )
+              .join("")}
+          </div>
+        </div>
+      </div>`,
+
+          financial_reports: () =>
+            pageHeader(
+              "Financial Reports",
+              "Revenue and collection analytics",
+            ) +
+            `
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4 animate-in delay-1">
+        ${statCard("trending-up", "Total Revenue", "$245,000", "#22c55e", 1)}
+        ${statCard("banknote", "Collected", "$198,000", "#6366f1", 2)}
+        ${statCard("alert-circle", "Pending", "$47,000", "#f59e0b", 3)}
+        ${statCard("percent", "Collection Rate", "81%", "#ec4899", 4)}
+      </div>
+      <div class="card animate-in delay-2">
+        <h3 class="font-bold text-surface-800 mb-3">Monthly Breakdown</h3>
+        <div class="space-y-2">${[
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+        ]
+          .map((m) => {
+            const v = Math.floor(Math.random() * 30 + 50);
+            return `
+          <div class="flex items-center gap-3"><span class="text-sm text-surface-600 w-20">${m}</span><div class="flex-1 progress-bar"><div class="progress-fill bg-brand-500" style="width:${v}%"></div></div><span class="text-xs font-semibold text-surface-700">${v}%</span></div>
+        `;
+          })
+          .join("")}</div>
+      </div>`,
+
+          // ---- NOTICES ----
+          notices: () => {
+            const sorted = [...state.notices]
+            .filter(n => {
+              if (state.role === 'super_admin' || state.role === 'school_admin') return true;
+              if (n.audience_all) return true;
+              if (state.role === 'student' && n.audience_students) return true;
+              if (state.role === 'parent' && n.audience_parents) return true;
+              if (state.role === 'staff' && n.audience_staff) return true;
+              return false;
+            })
+            .sort((a, b) => {
+              if (a.pinned && !b.pinned) return -1;
+              if (!a.pinned && b.pinned) return 1;
+              return new Date(b.date) - new Date(a.date);
+            });
+
+            return pageHeader(
+              "Notices",
+              "School announcements",
+              state.role !== "student" && state.role !== "parent"
+                ? `<button class="btn btn-primary" onclick="showScreen('create_notice')"><i data-lucide="plus" class="w-4 h-4"></i>Create</button>`
+                : "",
+            ) +
+            `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 animate-in delay-1">
+              ${sorted.map(n => {
+                const col = COLORS[parseInt(n.color) || 0] || COLORS[0];
+                return `
+                <div class="poster-card rounded-2xl shadow-md overflow-hidden bg-white border border-surface-100 flex flex-col h-full">
+                  <div class="h-1.5" style="background:${col.hex};"></div>
+                  <div class="p-5 flex flex-col flex-1">
+                    <div class="flex items-start justify-between mb-4">
+                      <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:${col.bg};">
+                        <i data-lucide="${n.icon || 'megaphone'}" class="w-5 h-5" style="color:${col.text};"></i>
+                      </div>
+                      <div class="flex items-center gap-1.5">
+                        ${n.pinned ? `<span class="tag bg-brand-50 text-brand-600"><i data-lucide="pin" class="w-2.5 h-2.5"></i>Pinned</span>` : ''}
+                        ${state.role !== 'student' && state.role !== 'parent' ? `
+                          <button class="w-7 h-7 rounded-lg hover:bg-surface-100 flex items-center justify-center transition-colors group" onclick="deleteNotice(${n.id})">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5 text-surface-400 group-hover:text-red-500"></i>
+                          </button>
+                        ` : ''}
+                      </div>
+                    </div>
+                    <div class="flex-1">
+                      <h3 class="font-bold text-base text-surface-900 leading-tight mb-2 font-display">${n.title}</h3>
+                      <p class="text-sm text-surface-600 leading-relaxed mb-4">${n.content}</p>
+                    </div>
+                    <div class="pt-4 mt-auto border-t border-surface-50 flex items-center justify-between">
+                      <div class="flex gap-1.5 flex-wrap">
+                        ${n.audience_all ? `<span class="tag bg-surface-100 text-surface-500">All</span>` : ''}
+                        ${!n.audience_all && n.audience_students ? `<span class="tag bg-surface-100 text-surface-500">Students</span>` : ''}
+                        ${!n.audience_all && n.audience_parents ? `<span class="tag bg-surface-100 text-surface-500">Parents</span>` : ''}
+                        ${!n.audience_all && n.audience_staff ? `<span class="tag bg-surface-100 text-surface-500">Staff</span>` : ''}
+                      </div>
+                      <span class="text-[10px] text-surface-400 font-medium whitespace-nowrap">${n.date}</span>
+                    </div>
+                  </div>
+                </div>
+                `;
+              }).join("")}
+            </div>`;
+          },
+
+          create_notice: () =>
+            pageHeader(
+              "Create Notice",
+              "Publish professional poster-style announcements",
+              `<button class="btn btn-ghost" onclick="showScreen('notices')">← Back</button>`,
+            ) +
+            `
+      <div class="card max-w-3xl animate-in delay-1 overflow-hidden p-0">
+        <div id="notice-preview-bar" class="h-2 transition-colors duration-300" style="background:${COLORS[state.selectedNoticeColor].hex};"></div>
+        <form class="p-6 space-y-6" onsubmit="event.preventDefault(); const n = {
+          id: Date.now(),
+          title: document.getElementById('f-title').value,
+          content: document.getElementById('f-desc').value,
+          color: String(state.selectedNoticeColor),
+          icon: ICONS[state.selectedNoticeIcon],
+          audience_all: document.getElementById('aud-all').checked,
+          audience_students: document.getElementById('aud-students').checked,
+          audience_parents: document.getElementById('aud-parents').checked,
+          audience_staff: document.getElementById('aud-staff').checked,
+          pinned: document.getElementById('f-pinned').checked,
+          date: new Date().toISOString().split('T')[0]
+        }; state.notices.unshift(n); toast('Notice published successfully!'); showScreen('notices')">
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-bold text-surface-700 mb-1.5 pl-1">Notice Title</label>
+                <input id="f-title" type="text" required placeholder="e.g. Annual Sports Meet" class="form-input">
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-surface-700 mb-1.5 pl-1">Detailed Description</label>
+                <textarea id="f-desc" rows="4" required placeholder="Describe the notice in detail..." class="form-input resize-none"></textarea>
+              </div>
+              <div class="flex items-center gap-3 p-3 bg-brand-50/50 rounded-xl border border-brand-100">
+                <input type="checkbox" id="f-pinned" class="w-4 h-4 rounded text-brand-500 accent-brand-500">
+                <label for="f-pinned" class="text-sm font-semibold text-brand-700 cursor-pointer">Pin to top of list</label>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-bold text-surface-700 mb-3 pl-1">Visual Branding</label>
+                <div class="p-4 bg-surface-50 rounded-2xl border border-surface-200">
+                   <div class="mb-4">
+                     <span class="text-[10px] font-bold text-surface-400 uppercase tracking-widest block mb-2">Theme Color</span>
+                     <div id="color-swatches" class="flex flex-wrap gap-2">
+                       ${COLORS.map((col, i) => `
+                        <div class="color-swatch ${i === state.selectedNoticeColor ? 'active' : ''}" 
+                             style="background:${col.hex};" 
+                             onclick="selectNoticeColor(${i}, this)"></div>
+                       `).join('')}
+                     </div>
+                   </div>
+                   <div>
+                     <span class="text-[10px] font-bold text-surface-400 uppercase tracking-widest block mb-2">Representative Icon</span>
+                     <div id="icon-options" class="flex flex-wrap gap-2">
+                       ${ICONS.map((ic, i) => `
+                        <div class="icon-option ${i === state.selectedNoticeIcon ? 'active' : ''}" 
+                             onclick="selectNoticeIcon(${i}, this)">
+                          <i data-lucide="${ic}" class="w-4 h-4"></i>
+                        </div>
+                       `).join('')}
+                     </div>
+                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-surface-100">
+            <label class="block text-sm font-bold text-surface-700 mb-4 pl-1">Target Audience Configuration</label>
+            <div class="p-6 bg-surface-50 rounded-2xl border border-surface-200 space-y-4">
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <label class="flex items-center gap-2 p-2 rounded-lg hover:bg-white transition-colors cursor-pointer border border-transparent hover:border-surface-200 text-xs font-bold text-surface-700">
+                  <input type="checkbox" id="aud-all" onchange="handleNoticeAudienceChange()" class="w-4 h-4 rounded text-brand-500 accent-brand-500">All Users
+                </label>
+                <label class="flex items-center gap-2 p-2 rounded-lg hover:bg-white transition-colors cursor-pointer border border-transparent hover:border-surface-200 text-xs font-bold text-surface-700">
+                  <input type="checkbox" id="aud-students" onchange="handleNoticeAudienceChange()" class="w-4 h-4 rounded text-brand-500 accent-brand-500">Students
+                </label>
+                <label class="flex items-center gap-2 p-2 rounded-lg hover:bg-white transition-colors cursor-pointer border border-transparent hover:border-surface-200 text-xs font-bold text-surface-700">
+                  <input type="checkbox" id="aud-parents" onchange="handleNoticeAudienceChange()" class="w-4 h-4 rounded text-brand-500 accent-brand-500">Parents
+                </label>
+                <label class="flex items-center gap-2 p-2 rounded-lg hover:bg-white transition-colors cursor-pointer border border-transparent hover:border-surface-200 text-xs font-bold text-surface-700">
+                  <input type="checkbox" id="aud-staff" onchange="handleNoticeAudienceChange()" class="w-4 h-4 rounded text-brand-500 accent-brand-500">Staff Members
+                </label>
+              </div>
+
+              <div id="audience-specifics" class="space-y-3">
+                <!-- Students: Class & Section -->
+                <div id="specific-students-section" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                  <div class="relative">
+                    <button type="button" onclick="toggleNoticeDropdown('students-class-dropdown')" class="w-full text-left px-3 py-2 rounded-lg border border-surface-200 bg-white text-xs flex items-center justify-between">
+                      <span id="students-class-label" class="text-surface-400">Target Classes...</span>
+                      <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <div id="students-class-dropdown" class="dropdown-panel hidden absolute top-full left-0 right-0 mt-1 bg-white border border-surface-200 rounded-lg shadow-xl z-10 max-h-48 overflow-y-auto p-2">
+                      ${state.classes.map(c => `<label class="flex items-center gap-2 px-2 py-1.5 hover:bg-surface-50 rounded cursor-pointer text-xs"><input type="checkbox" value="${c}" onchange="updateNoticeDropdownLabel('students-class')" class="w-3.5 h-3.5 accent-brand-500">${c}</label>`).join('')}
+                    </div>
+                  </div>
+                  <div class="relative">
+                    <button type="button" onclick="toggleNoticeDropdown('students-section-dropdown')" class="w-full text-left px-3 py-2 rounded-lg border border-surface-200 bg-white text-xs flex items-center justify-between">
+                      <span id="students-section-label" class="text-surface-400">Target Sections...</span>
+                      <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <div id="students-section-dropdown" class="dropdown-panel hidden absolute top-full left-0 right-0 mt-1 bg-white border border-surface-200 rounded-lg shadow-xl z-10 max-h-48 overflow-y-auto p-2">
+                      <label class="flex items-center gap-2 px-2 py-1.5 hover:bg-surface-50 rounded cursor-pointer text-xs"><input type="checkbox" value="A" onchange="updateNoticeDropdownLabel('students-section')" class="w-3.5 h-3.5 accent-brand-500">Section A</label>
+                      <label class="flex items-center gap-2 px-2 py-1.5 hover:bg-surface-50 rounded cursor-pointer text-xs"><input type="checkbox" value="B" onchange="updateNoticeDropdownLabel('students-section')" class="w-3.5 h-3.5 accent-brand-500">Section B</label>
+                      <label class="flex items-center gap-2 px-2 py-1.5 hover:bg-surface-50 rounded cursor-pointer text-xs"><input type="checkbox" value="C" onchange="updateNoticeDropdownLabel('students-section')" class="w-3.5 h-3.5 accent-brand-500">Section C</label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Parents Section -->
+                <div id="specific-parents-section" class="hidden pt-2">
+                  <div class="relative">
+                    <button type="button" onclick="toggleNoticeDropdown('parents-type-dropdown')" class="w-full text-left px-3 py-2 rounded-lg border border-surface-200 bg-white text-xs flex items-center justify-between">
+                      <span id="parents-type-label" class="text-surface-400">Parent Target Type...</span>
+                      <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <div id="parents-type-dropdown" class="dropdown-panel hidden absolute top-full left-0 right-0 mt-1 bg-white border border-surface-200 rounded-lg shadow-xl z-10 p-2">
+                      <label class="flex items-center gap-2 px-2 py-1.5 hover:bg-surface-50 rounded cursor-pointer text-xs"><input type="radio" name="parent-type" value="all-parents" onchange="handleNoticeParentTypeChange()" class="w-3.5 h-3.5 accent-brand-500"> All Parents</label>
+                      <label class="flex items-center gap-2 px-2 py-1.5 hover:bg-surface-50 rounded cursor-pointer text-xs"><input type="radio" name="parent-type" value="class-wise" onchange="handleNoticeParentTypeChange()" class="w-3.5 h-3.5 accent-brand-500"> Class-wise Parents</label>
+                      <label class="flex items-center gap-2 px-2 py-1.5 hover:bg-surface-50 rounded cursor-pointer text-xs"><input type="radio" name="parent-type" value="specific" onchange="handleNoticeParentTypeChange()" class="w-3.5 h-3.5 accent-brand-500"> Specific Parents Mapping</label>
+                    </div>
+                  </div>
+                  <div id="parents-classwise-section" class="hidden mt-2 relative">
+                    <button type="button" onclick="toggleNoticeDropdown('parents-classwise-dropdown')" class="w-full text-left px-3 py-2 rounded-lg border border-surface-200 bg-white text-xs flex items-center justify-between">
+                      <span id="parents-classwise-label" class="text-surface-400">Select Classes...</span>
+                      <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <div id="parents-classwise-dropdown" class="dropdown-panel hidden absolute top-full left-0 right-0 mt-1 bg-white border border-surface-200 rounded-lg shadow-xl z-10 max-h-48 overflow-y-auto p-2">
+                      ${state.classes.map(c => `<label class="flex items-center gap-2 px-2 py-1.5 hover:bg-surface-50 rounded cursor-pointer text-xs"><input type="checkbox" value="${c}" onchange="updateNoticeDropdownLabel('parents-classwise')" class="w-3.5 h-3.5 accent-brand-500">${c}</label>`).join('')}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Staff Section -->
+                <div id="specific-staff-section" class="hidden pt-2">
+                  <div class="relative">
+                    <button type="button" onclick="toggleNoticeDropdown('staff-type-dropdown')" class="w-full text-left px-3 py-2 rounded-lg border border-surface-200 bg-white text-xs flex items-center justify-between">
+                      <span id="staff-type-label" class="text-surface-400">Select Staff Type...</span>
+                      <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <div id="staff-type-dropdown" class="dropdown-panel hidden absolute top-full left-0 right-0 mt-1 bg-white border border-surface-200 rounded-lg shadow-xl z-10 p-2">
+                      <label class="flex items-center gap-2 px-2 py-1.5 hover:bg-surface-50 rounded cursor-pointer text-xs"><input type="checkbox" value="Teaching" onchange="updateNoticeDropdownLabel('staff-type')" class="w-3.5 h-3.5 accent-brand-500"> Teaching Staff</label>
+                      <label class="flex items-center gap-2 px-2 py-1.5 hover:bg-surface-50 rounded cursor-pointer text-xs"><input type="checkbox" value="Non-Teaching" onchange="updateNoticeDropdownLabel('staff-type')" class="w-3.5 h-3.5 accent-brand-500"> Non-Teaching Staff</label>
+                      <label class="flex items-center gap-2 px-2 py-1.5 hover:bg-surface-50 rounded cursor-pointer text-xs"><input type="checkbox" value="Admin" onchange="updateNoticeDropdownLabel('staff-type')" class="w-3.5 h-3.5 accent-brand-500"> Administrative Board</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-4 pt-4">
+             <button type="button" class="btn btn-ghost px-8" onclick="showScreen('notices')">Discard</button>
+             <button type="submit" class="btn btn-primary flex-1 justify-center py-3">Publish Announcement Now</button>
+          </div>
+        </form>
+      </div>`,
+
+          contact: () => {
+            if (!state.contactRoleFilters) {
+              state.contactRoleFilters = {
+                staff: true,
+                parent: true,
+                student: true
+              };
+            }
+
+            // 1. Initial RBAC Filter (Role Base Access)
+            let baseContacts = state.contacts;
+            
+            if (state.role === 'super_admin') {
+              const allowedForSuper = ['Principal', 'Vice Principal', 'School Admin', 'Admin', 'Staff', 'Teacher'];
+              baseContacts = baseContacts.filter(c => allowedForSuper.includes(c.type));
+            } else {
+              baseContacts = baseContacts.filter(c => c.schoolId === state.school);
+              const allowedForOthers = ['Staff', 'Teacher', 'Admin', 'Student', 'Parent'];
+              baseContacts = baseContacts.filter(c => allowedForOthers.includes(c.type));
+            }
+
+            // 2. Apply Dynamic Filters
+            const filtered = baseContacts.filter(c => {
+              const matchesSearch = (c.name + c.role + (c.dept||"") + (c.class||"")).toLowerCase().includes(state.contactSearch.toLowerCase());
+              
+              if (state.role === 'super_admin') {
+                const matchesSchool = state.contactSchoolFilter === "All" || c.schoolId === parseInt(state.contactSchoolFilter);
+                return matchesSearch && matchesSchool;
+              } else {
+                let show = false;
+                if (['Teacher', 'Staff', 'Admin'].includes(c.type) && state.contactRoleFilters.staff) show = true;
+                if (c.type === 'Parent' && state.contactRoleFilters.parent) show = true;
+                if (c.type === 'Student' && state.contactRoleFilters.student) show = true;
+                return matchesSearch && show;
+              }
+            });
+
+            // Sort alphabetically by name
+            filtered.sort((a, b) => a.name.localeCompare(b.name));
+
+            const uniqueSchools = state.schools.map((s, i) => ({ id: i, name: s.name }));
+
+            return pageHeader("Contact Directory", `Viewing contacts as ${state.role.replace('_', ' ')}`) +
+            `<div class="flex flex-col gap-6 animate-in delay-1">
+              <!-- Advanced Filters Panel -->
+              <div class="card p-4">
+                <div class="flex flex-col md:flex-row gap-3">
+                  <div class="relative flex-1">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400"></i>
+                    <input type="text" id="contactSearchInput" placeholder="Search contacts by name, role, dept or class..." class="form-input pl-10 h-10" 
+                           value="${state.contactSearch}" oninput="state.contactSearch=this.value; showScreen('contact'); document.getElementById('contactSearchInput').focus();">
+                  </div>
+                  
+                  ${state.role === 'super_admin' ? `
+                    <div class="w-full md:w-64">
+                      <select class="form-input text-sm h-10" onchange="state.contactSchoolFilter=this.value; showScreen('contact')">
+                        <option value="All" ${state.contactSchoolFilter === 'All' ? 'selected' : ''}>All Schools</option>
+                        ${uniqueSchools.map(s => `<option value="${s.id}" ${state.contactSchoolFilter == s.id ? 'selected' : ''}>${s.name}</option>`).join('')}
+                      </select>
+                    </div>
+                  ` : `
+                    <div class="relative">
+                      <button type="button" onclick="document.getElementById('contact-type-filter').classList.toggle('hidden')" class="btn btn-outline h-10 px-4 flex items-center justify-between gap-2 bg-white min-w-[140px]">
+                        <span class="flex items-center gap-2"><i data-lucide="filter" class="w-4 h-4 text-surface-500"></i> Filter</span>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+                      </button>
+                      <div id="contact-type-filter" class="dropdown-panel hidden absolute right-0 top-full mt-2 w-56 bg-white border border-surface-200 rounded-lg shadow-xl z-20 p-3">
+                         <div class="space-y-1 mb-3">
+                           <label class="flex items-center gap-2 px-2 py-1.5 hover:bg-surface-50 rounded cursor-pointer text-sm font-medium text-surface-700">
+                             <input type="checkbox" id="temp-staff-filter" class="w-4 h-4 accent-brand-500" ${state.contactRoleFilters.staff ? 'checked':''}> Staff / Teachers
+                           </label>
+                           <label class="flex items-center gap-2 px-2 py-1.5 hover:bg-surface-50 rounded cursor-pointer text-sm font-medium text-surface-700">
+                             <input type="checkbox" id="temp-parent-filter" class="w-4 h-4 accent-brand-500" ${state.contactRoleFilters.parent ? 'checked':''}> Parents
+                           </label>
+                           <label class="flex items-center gap-2 px-2 py-1.5 hover:bg-surface-50 rounded cursor-pointer text-sm font-medium text-surface-700">
+                             <input type="checkbox" id="temp-student-filter" class="w-4 h-4 accent-brand-500" ${state.contactRoleFilters.student ? 'checked':''}> Students
+                           </label>
+                         </div>
+                         <div class="flex gap-2 pt-2 border-t border-surface-100">
+                           <button class="btn btn-ghost flex-1 text-xs py-1.5 h-auto text-surface-500" onclick="state.contactRoleFilters={staff:true,parent:true,student:true}; showScreen('contact')">Reset</button>
+                           <button class="btn btn-primary flex-1 text-xs py-1.5 h-auto" onclick="state.contactRoleFilters.staff=document.getElementById('temp-staff-filter').checked; state.contactRoleFilters.parent=document.getElementById('temp-parent-filter').checked; state.contactRoleFilters.student=document.getElementById('temp-student-filter').checked; showScreen('contact')">Apply</button>
+                         </div>
+                      </div>
+                    </div>
+                  `}
+                </div>
+              </div>
+
+              <!-- Filtered Contact Grid -->
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-8">
+                ${filtered.length ? filtered.map(c => `
+                  <div class="card flex flex-col justify-between hover:border-brand-300 transition-all group overflow-hidden">
+                    <div class="absolute top-0 right-0 p-2 opacity-5">
+                      <i data-lucide="building-2" class="w-16 h-16"></i>
+                    </div>
+                    <div>
+                      <div class="flex items-center justify-between mb-4">
+                        <div class="avatar bg-brand-500 text-white" style="width:40px;height:40px;font-size:14px">
+                          ${c.name.split(' ').map(n=>n[0]).join('').substring(0,2)}
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-50 text-brand-600 uppercase tracking-tight">
+                          ${c.type}
+                        </span>
+                      </div>
+                      <div class="mb-4">
+                        <div class="font-bold text-surface-800 text-base font-display">${c.name}</div>
+                        <div class="text-xs text-brand-600 font-semibold mt-0.5">${c.role}</div>
+                        <div class="flex gap-2 mt-2">
+                          ${c.dept ? `<span class="text-[9px] bg-surface-100 px-1.5 py-0.5 rounded text-surface-500 font-medium">${c.dept}</span>` : ''}
+                          ${c.class ? `<span class="text-[9px] bg-brand-50 px-1.5 py-0.5 rounded text-brand-600 font-medium">Class ${c.class}</span>` : ''}
+                        </div>
+                      </div>
+                      ${state.role === 'super_admin' ? `
+                        <div class="text-[10px] text-surface-400 mb-3 italic">School: ${state.schools[c.schoolId].name}</div>
+                      ` : ''}
+                      <div class="space-y-2 text-sm pt-4 border-t border-surface-100">
+                        <div class="flex items-center gap-2 text-surface-600"><i data-lucide="phone" class="w-3.5 h-3.5 text-surface-400"></i>${c.phone}</div>
+                        <div class="flex items-center gap-2 text-surface-600"><i data-lucide="mail" class="w-3.5 h-3.5 text-surface-400"></i>${c.email}</div>
+                      </div>
+                    </div>
+                    <div class="mt-6 grid grid-cols-3 gap-2">
+                      <button class="btn btn-outline text-[10px] px-0 h-9 justify-center bg-white hover:bg-brand-50" onclick="toast('Calling ${c.name}...')"><i data-lucide="phone" class="w-3.5 h-3.5"></i></button>
+                      <button class="btn btn-outline text-[10px] px-0 h-9 justify-center bg-white hover:bg-brand-50" onclick="toast('Emailing ${c.name}...')"><i data-lucide="mail" class="w-3.5 h-3.5"></i></button>
+                      <button class="btn border-green-200 bg-green-50 text-green-700 hover:bg-green-100 text-[10px] px-0 h-9 justify-center" onclick="toast('WhatsApping ${c.name}...')"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i></button>
+                    </div>
+                  </div>
+                `).join('') : `
+                  <div class="col-span-full py-12 text-center">
+                    <div class="w-16 h-16 bg-surface-50 rounded-full flex items-center justify-center mx-auto mb-4 text-surface-300"><i data-lucide="search-x" class="w-8 h-8"></i></div>
+                    <p class="text-surface-500 font-medium">No results found for current filters.</p>
+                    <button class="text-brand-500 text-sm mt-2 font-semibold hover:underline" onclick="state.contactSearch='';state.contactSchoolFilter='All';state.contactRoleFilters={staff:true,parent:true,student:true};showScreen('contact')">Reset All Filters</button>
+                  </div>
+                `}
+              </div>
+            </div>`;
+          },
+
+          // ---- SUBSCRIPTION AND REVENUE ----
+          subscription_plans: () => 
+            pageHeader("Subscription Plans", "Manage Tipic software plans and school subscriptions") +
+            `<div class="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in delay-1">
+              ${[
+                {name: "Basic Plan", desc: "For small schools", price: "$299/mo", schools: 1, features: ["Up to 500 Students", "Basic Reporting", "Email Support"]},
+                {name: "Pro Plan", desc: "For medium schools", price: "$599/mo", schools: 2, features: ["Up to 2000 Students", "Advanced Analytics", "Priority Support", "WhatsApp Integration"]},
+                {name: "Enterprise", desc: "For school groups", price: "$999/mo", schools: 0, features: ["Unlimited Students", "Custom Branding", "Dedicated Manager", "API Access"]}
+              ].map((p, i) => `
+                <div class="${i===1 ? 'border-brand-500 shadow-xl scale-105' : 'border-surface-200'} border card flex flex-col items-center text-center hover:border-brand-500 transition-all relative">
+                  ${i===1 ? '<div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-500 text-white text-[10px] uppercase font-bold px-3 py-1 rounded-full">Most Popular</div>' : ''}
+                  <h3 class="font-bold text-xl text-surface-900 mb-1">${p.name}</h3>
+                  <p class="text-xs text-surface-500 mb-4">${p.desc}</p>
+                  <div class="text-3xl font-display font-bold text-brand-600 mb-6">${p.price}</div>
+                  <div class="w-full space-y-3 mb-6 flex-1 text-left">
+                    ${p.features.map(f => `<div class="flex items-center gap-2 text-sm text-surface-700"><i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i>${f}</div>`).join('')}
+                  </div>
+                  <div class="w-full p-3 bg-surface-50 rounded-lg mb-4 text-sm font-semibold text-surface-600">
+                    Active Schools: <span class="text-brand-600">${p.schools}</span>
+                  </div>
+                  <button class="btn btn-outline w-full justify-center">Edit Plan</button>
+                </div>
+              `).join('')}
+            </div>`,
+
+          revenue_tracking: () =>
+            pageHeader("Revenue Tracking", "Financial analytics for Tipic platform") +
+            `<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in delay-1">
+              <div class="card lg:col-span-2">
+                <div class="flex items-center justify-between mb-6">
+                  <h3 class="font-bold text-surface-800">Monthly Revenue (YTD)</h3>
+                  <select class="form-input text-sm w-32"><option>2026</option><option>2025</option></select>
+                </div>
+                <!-- Mock Chart Area -->
+                <div class="w-full h-64 bg-surface-50 rounded-xl flex items-end justify-between px-6 pt-12 pb-2 gap-2">
+                  ${[65, 59, 80, 81, 56, 55, 40, 60, 75, 90, 100, 110].map((h, i) => `
+                    <div class="w-full bg-brand-500 hover:bg-brand-600 rounded-t-sm transition-all relative group" style="height: ${h}%">
+                      <div class="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -content-center -translate-x-1/2 bg-surface-800 text-white text-[10px] py-1 px-2 rounded">$${h}k</div>
+                    </div>
+                  `).join('')}
+                </div>
+                <div class="flex justify-between px-6 mt-2 text-[10px] text-surface-400 font-bold uppercase tracking-wider">
+                  <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+                </div>
+              </div>
+              <div class="space-y-6">
+                <div class="card bg-brand-50 border border-brand-100">
+                  <h3 class="font-bold text-brand-900 mb-1">Total MRR</h3>
+                  <div class="text-3xl font-display font-bold text-brand-600 mb-2">$39,450</div>
+                  <div class="text-sm text-brand-700 flex items-center gap-1"><i data-lucide="trending-up" class="w-4 h-4"></i> +12.5% from last month</div>
+                </div>
+                <div class="card">
+                  <h3 class="font-bold text-surface-800 mb-4">Recent Payments</h3>
+                  <div class="space-y-3">
+                    ${['Springfield Academy - $599', 'Riverside High - $299', 'Tech Valley High - $999', 'Oakwood Int. - $599'].map(t => `
+                      <div class="flex justify-between items-center py-2 border-b border-surface-100 last:border-0">
+                        <div class="flex items-center gap-3">
+                          <div class="w-8 h-8 rounded-full bg-success-100 text-success-600 flex items-center justify-center"><i data-lucide="arrow-down-left" class="w-4 h-4"></i></div>
+                          <div class="text-sm font-semibold text-surface-700">${t.split(' - ')[0]}</div>
+                        </div>
+                        <div class="text-sm font-bold text-surface-900">${t.split(' - ')[1]}</div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+            </div>`,
+
+          // ---- EVENTS & GALLERY ----
+          events: () =>
+            pageHeader(
+              "Events",
+              "School events timeline",
+              state.role === 'school_admin' ? `<button class="btn btn-primary" onclick="showScreen('add_event')"><i data-lucide="plus" class="w-4 h-4"></i>Add Event</button>` : "",
+            ) +
+            `
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in delay-1">${state.events
+        .map(
+          (e) => `
+        <div class="card">
+          <div class="w-full h-24 rounded-xl mb-3 flex items-center justify-center text-3xl" style="background:linear-gradient(135deg,#6366f1,#818cf8)">🎉</div>
+          <h3 class="font-bold text-surface-800">${e.title}</h3>
+          <p class="text-xs text-surface-500 mt-1">${e.date} · ${e.type}</p>
+          <p class="text-sm text-surface-600 mt-2">${e.desc}</p>
+        </div>
+      `,
+        )
+        .join("")}</div>`,
+
+          add_event: () =>
+            pageHeader(
+              "Add Event",
+              "Create a new event",
+              `<button class="btn btn-ghost" onclick="showScreen('events')">← Back</button>`,
+            ) +
+            `
+      <div class="card max-w-2xl animate-in delay-1">
+        <form onsubmit="event.preventDefault();toast('Event created!');showScreen('events')">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-group"><label class="form-label">Event Title</label><input class="form-input" placeholder="Event name" required></div>
+            <div class="form-group"><label class="form-label">Type</label><select class="form-input"><option>Academic</option><option>Sports</option><option>Cultural</option><option>Other</option></select></div>
+            <div class="form-group"><label class="form-label">Date</label><input type="date" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Venue</label><input class="form-input" placeholder="Location"></div>
+            <div class="form-group md:col-span-2"><label class="form-label">Description</label><textarea class="form-input" rows="3" placeholder="Event details..."></textarea></div>
+          </div>
+          <div class="flex gap-2 mt-4"><button type="submit" class="btn btn-primary">Create Event</button></div>
+        </form>
+      </div>`,
+
+          gallery: () =>
+            pageHeader("Gallery", "School photo gallery") +
+            `
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 animate-in delay-1">
+        ${[
+          "🏆 Sports Day",
+          "🎭 Drama Night",
+          "🔬 Science Fair",
+          "🎨 Art Show",
+          "📚 Book Fair",
+          "🎵 Music Fest",
+          "🏫 Campus",
+          "🌳 Garden",
+        ]
+          .map(
+            (e, i) => `
+          <div class="rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition" style="background:linear-gradient(${135 + i * 20}deg,${["#6366f1", "#22c55e", "#f59e0b", "#ec4899", "#3b82f6", "#8b5cf6", "#14b8a6", "#f97316"][i]}80,${["#818cf8", "#4ade80", "#fbbf24", "#f472b6", "#60a5fa", "#a78bfa", "#2dd4bf", "#fb923c"][i]}80);height:120px;display:flex;align-items:center;justify-content:center">
+            <span class="text-white font-bold text-sm text-center px-2">${e}</span>
+          </div>
+        `,
+          )
+          .join("")}
+      </div>`,
+
+          // ---- FORMS ----
+          form_builder: () =>
+            pageHeader("Form Builder", "Create custom forms") +
+            `
+      <div class="card max-w-2xl animate-in delay-1">
+        <div class="form-group"><label class="form-label">Form Title</label><input class="form-input" placeholder="e.g. Admission Form" id="fbTitle"></div>
+        <div id="formFields" class="space-y-3 mb-4">
+          <div class="p-3 border border-surface-200 rounded-lg flex items-center gap-3">
+            <i data-lucide="grip-vertical" class="w-4 h-4 text-surface-400"></i>
+            <input class="form-input flex-1" value="Full Name" placeholder="Field label">
+            <select class="form-input w-32"><option>Text</option><option>Number</option><option>Email</option><option>Dropdown</option><option>Date</option><option>Textarea</option></select>
+            <button class="btn btn-ghost p-1 text-danger-500"><i data-lucide="x" class="w-4 h-4"></i></button>
+          </div>
+          <div class="p-3 border border-surface-200 rounded-lg flex items-center gap-3">
+            <i data-lucide="grip-vertical" class="w-4 h-4 text-surface-400"></i>
+            <input class="form-input flex-1" value="Email Address" placeholder="Field label">
+            <select class="form-input w-32"><option>Text</option><option selected>Email</option><option>Number</option><option>Dropdown</option></select>
+            <button class="btn btn-ghost p-1 text-danger-500"><i data-lucide="x" class="w-4 h-4"></i></button>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn btn-outline" onclick="toast('Field added')"><i data-lucide="plus" class="w-4 h-4"></i>Add Field</button>
+          <button class="btn btn-primary" onclick="toast('Form saved!')">Save Form</button>
+        </div>
+      </div>`,
+
+          form_list: () =>
+            pageHeader("Forms", "Available forms", state.role === 'school_admin' ? `<button class="btn btn-primary" onclick="showScreen('form_builder')"><i data-lucide="plus" class="w-4 h-4"></i>Create Form</button>` : "") +
+            `
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in delay-1">
+        ${[
+          "Admission Form",
+          "Leave Application",
+          "Feedback Form",
+          "Transport Request",
+        ]
+          .map(
+            (f) => `
+          <div class="card cursor-pointer hover:border-brand-300">
+            <div class="flex items-center gap-3 mb-2"><i data-lucide="clipboard-list" class="w-5 h-5 text-brand-500"></i><span class="font-bold text-surface-800">${f}</span></div>
+            <div class="text-xs text-surface-500">12 responses</div>
+            <div class="flex gap-2 mt-3">
+              <button class="btn btn-outline text-xs" onclick="toast('Opening form...')"><i data-lucide="edit-3" class="w-3.5 h-3.5 mr-1"></i>Fill / View</button>
+              ${state.role === 'school_admin' ? `<button class="btn btn-ghost text-xs" onclick="toast('Opening builder to edit...')"><i data-lucide="settings" class="w-3.5 h-3.5 mr-1"></i> Edit Settings</button>` : ''}
+            </div>
+          </div>
+        `,
+          )
+          .join("")}
+      </div>`,
+
+          // ---- CMS ----
+          pages: () =>
+            pageHeader("Page Manager", "Manage website pages") +
+            `
+      <div class="card animate-in delay-1">
+        <div class="table-container">
+          <table><thead><tr><th>Page</th><th>Status</th><th>Last Updated</th><th>Actions</th></tr></thead>
+          <tbody>${["Home", "About Us", "Admissions", "Contact", "Gallery"]
+            .map(
+              (p) => `
+            <tr><td class="font-medium">${p}</td><td><span class="badge badge-success">Published</span></td><td class="text-sm text-surface-500">Feb 10, 2025</td>
+            <td><div class="flex gap-1"><button class="btn btn-ghost text-xs p-1"><i data-lucide="edit" class="w-4 h-4"></i></button><button class="btn btn-ghost text-xs p-1"><i data-lucide="eye" class="w-4 h-4"></i></button></div></td></tr>
+          `,
+            )
+            .join("")}</tbody></table>
+        </div>
+      </div>`,
+
+          // ---- SETTINGS ----
+          settings: () =>
+            pageHeader("Settings", "Application preferences") +
+            `
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 animate-in delay-1">
+        <div class="card">
+          <h3 class="font-bold text-surface-800 mb-4">General</h3>
+          <div class="form-group"><label class="form-label">Platform Name</label><input class="form-input" value="Tipic"></div>
+          <div class="form-group"><label class="form-label">Timezone</label><select class="form-input"><option>UTC-5 (Eastern)</option><option>UTC-6 (Central)</option><option>UTC-8 (Pacific)</option></select></div>
+          <div class="form-group"><label class="form-label">Language</label><select class="form-input"><option>English</option><option>Spanish</option><option>French</option></select></div>
+          <button class="btn btn-primary" onclick="toast('Settings saved!')">Save</button>
+        </div>
+        <div class="card">
+          <h3 class="font-bold text-surface-800 mb-4">Notifications</h3>
+          <div class="space-y-3">
+            ${[
+              "Email Notifications",
+              "SMS Alerts",
+              "Push Notifications",
+              "Weekly Reports",
+            ]
+              .map(
+                (n) => `
+              <label class="flex items-center justify-between p-3 bg-surface-50 rounded-lg cursor-pointer">
+                <span class="text-sm text-surface-700">${n}</span>
+                <div class="relative"><input type="checkbox" class="sr-only peer" checked><div class="w-10 h-5 bg-surface-300 rounded-full peer-checked:bg-brand-500 transition-colors"></div><div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full peer-checked:translate-x-5 transition-transform"></div></div>
+              </label>
+            `,
+              )
+              .join("")}
+          </div>
+        </div>
+      </div>`,
+        };
+
+        const fn = screens[id];
+        const name = id
+          .replace(/_/g, " ")
+          .split(" ")
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(" ");
+        return fn
+          ? fn()
+          : `<div class="card"><h2 class="font-bold text-surface-800 text-lg mb-2">${name}</h2><p class="text-surface-500">This screen is under construction.</p></div>`;
+      }
+
+      // ========================= QR & HELPERS =========================
+      function markAttendanceViaQR() {
+        if (!navigator.geolocation) {
+          toast('Geolocation is not supported by your browser', 'error');
+          return;
+        }
+        toast('Initializing Secure QR Scanner...', 'info');
+        setTimeout(() => {
+          navigator.geolocation.getCurrentPosition((position) => {
+            // Simulated validation of school premises GPS coordinates
+            toast('GPS Verified: Inside Springfield Academy', 'success');
+            toast('Attendance successfully marked for today!', 'success');
+          }, (err) => {
+            toast('Location verification failed. Please enable GPS.', 'error');
+          });
+        }, 1200);
+      }
+
+      function generateQR() {
+        openModal(`
+          <div class="text-center p-6">
+            <h3 class="font-bold text-xl mb-1 mt-2 text-surface-900">Attendance QR</h3>
+            <p class="text-sm text-surface-500 mb-6">Ask students to scan this code</p>
+            <div class="w-56 h-56 bg-surface-50 mx-auto mb-6 flex items-center justify-center rounded-2xl border-2 border-dashed border-brand-200">
+              <i data-lucide="qr-code" class="w-40 h-40 text-brand-500"></i>
+            </div>
+            <p class="text-[11px] text-surface-400 mb-6 italic">Geofencing is active during scanning.</p>
+            <button class="btn btn-primary w-full py-3" onclick="closeModal()">Dismiss QR Code</button>
+          </div>
+        `);
+      }
+
+      // ========================= INIT =========================
+      function init() {
+        switchRole("super_admin");
+        applyConfig(defaultConfig);
+      }
+
+      init();
+    </script>
+  </body>
+</html>
